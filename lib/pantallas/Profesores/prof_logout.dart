@@ -13,19 +13,26 @@ class ProflogoutScreen extends StatelessWidget {
         width: double.infinity,
         color: const Color.fromRGBO(1,6,24,1),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Image.asset('assets/imagenes/sombrero-de-graduacion.png'),
+            const SizedBox(height: 100),
+            SizedBox(
+              width: 115,
+              height: 115,
+              child: Image.asset('assets/imagenes/fotoperfil1.png'),
+            ),
             const SizedBox(height: 20),
+
             const Text(
-              'KUNAN',
+              'Rosa Ramos',
               style: TextStyle(
-                fontSize: 30,
-                color: Color.fromRGBO(178,219,144,1),
+                fontSize: 32,
+                color: Colors.grey,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 100),
+
+            const SizedBox(height: 240),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -42,8 +49,9 @@ class ProflogoutScreen extends StatelessWidget {
               child: const Text(
                 'Cerrar Sesión',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 20,
                   color: Colors.black,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -52,7 +60,7 @@ class ProflogoutScreen extends StatelessWidget {
       ),
       bottomNavigationBar: const CustomBottomNavigationBar(
         initialIndex: 2,
-        usuario: 'Profesor',
+        usuario: 'Alumno',
       ),
     );
 
