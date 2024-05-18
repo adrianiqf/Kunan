@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kunan_v01/pantallas/inicio.dart';
 
+import 'Controladores/save_preferences.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -15,6 +17,7 @@ class MyApp extends StatelessWidget {
       //home: InicioScreen(),
       home: AnimatedSplashScreen(),
     );
+
   }
 }
 
@@ -43,6 +46,12 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen> with Single
       end: 1,
     ).animate(_controller);
     _controller.forward();
+
+    _clearSharedPreferences();
+  }
+
+  void _clearSharedPreferences() async {
+    await SharedPrefUtils.clearData();
   }
 
   @override

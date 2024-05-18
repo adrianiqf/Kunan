@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:kunan_v01/pantallas/register.dart';
+import 'package:kunan_v01/pantallas/seleccionar_usuario.dart';
+
+import '../Controladores/usario.dart';
 
 class LoginScreen extends StatefulWidget {
-  LoginScreen({super.key});
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -18,8 +21,30 @@ class _LoginScreenState extends State<LoginScreen> {
     String email = _emailController.text;
     String password = _passwordController.text;
 
-    print('Correo electrónico: $email');
-    print('Contraseña: $password');
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, ingresa el correo y la contraseña')),
+      );
+      return;
+    }
+
+    if (!email.endsWith('@unmsm.edu.pe')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, ingresa un correo de la UNMSM')),
+      );
+      return;
+    }
+
+    if (usuario.validarUsuario(email, password)) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const SelectUserScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Correo o contraseña incorrectos')),
+      );
+    }
   }
 
   @override
@@ -43,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Container(
+              SizedBox(
                 width: 250,
                 child: SingleChildScrollView(
                   child: Column(
@@ -59,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Container(
+                      SizedBox(
                         height: 50,
                         child: TextField(
                           controller: _emailController,
@@ -134,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 50),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: _login,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromRGBO(178,219,144,1),
                   shape: RoundedRectangleBorder(
