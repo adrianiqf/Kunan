@@ -3,8 +3,8 @@ import 'package:kunan_v01/pantallas/inicio.dart';
 
 import '../../widgets/custom_navigationbar.dart';
 
-class EstlogoutScreen extends StatelessWidget {
-  const EstlogoutScreen({super.key});
+class ProflogoutScreen extends StatelessWidget {
+  const ProflogoutScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,26 +13,19 @@ class EstlogoutScreen extends StatelessWidget {
         width: double.infinity,
         color: const Color.fromRGBO(1,6,24,1),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 100),
-            SizedBox(
-              width: 115,
-              height: 115,
-              child: Image.asset('assets/imagenes/fotoperfil2.png'),
-            ),
+            Image.asset('assets/imagenes/sombrero-de-graduacion.png'),
             const SizedBox(height: 20),
-
             const Text(
-              'Jose Ruiz',
+              'KUNAN',
               style: TextStyle(
-                fontSize: 32,
-                color: Colors.grey,
+                fontSize: 30,
+                color: Color.fromRGBO(178,219,144,1),
                 fontWeight: FontWeight.bold,
               ),
             ),
-
-            const SizedBox(height: 240),
+            const SizedBox(height: 100),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -49,9 +42,8 @@ class EstlogoutScreen extends StatelessWidget {
               child: const Text(
                 'Cerrar Sesión',
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 16,
                   color: Colors.black,
-                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -60,7 +52,7 @@ class EstlogoutScreen extends StatelessWidget {
       ),
       bottomNavigationBar: const CustomBottomNavigationBar(
         initialIndex: 2,
-        usuario: 'Alumno',
+        usuario: 'Profesor',
       ),
     );
 
