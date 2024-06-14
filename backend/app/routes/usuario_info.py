@@ -20,3 +20,4 @@ def usuario_info(id_usuario):
         return jsonify(result['usuario']), 200
     else:
         return jsonify({"error": result['message']}), 400
+        
