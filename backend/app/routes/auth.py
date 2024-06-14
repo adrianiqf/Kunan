@@ -39,7 +39,6 @@ def login():
     user = authenticate_user(db, correo, password)
     
     if user:
-        # retornar el usuario.esprofesor y mensaje de acceso exitoso
-        return jsonify({"esProfesor": user.esProfesor, "acceso": "Acceso exitoso"}), 200
+        return jsonify({"id": user['id'], "esProfesor": user['esprofesor'], "acceso": "Acceso exitoso"}), 200
     else:
         return jsonify({"error": "Credenciales inválidas"}), 401

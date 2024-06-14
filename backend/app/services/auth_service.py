@@ -29,6 +29,12 @@ def create_user(db, usuario):
         for doc in existing_user_ref:
             print("Error: Ya existe un usuario con el mismo código.")
             return False
+        
+        # Verificar si ya existe un usuario con el mismo correo
+        existing_user_ref = db.collection('usuario').where('correo', '==', usuario.correo).limit(1).stream()
+        for doc in existing_user_ref:
+            print("Error: Ya existe un usuario con el mismo correo.")
+            return False
 
         # Añadir usuario a la colección y obtener su ID generado automáticamente
         doc_ref = db.collection('usuario').add(usuario.to_dict())
@@ -52,7 +58,7 @@ def authenticate_user(db, correo, password):
         for doc in user_ref:
             user = Usuario.from_dict(doc.to_dict())
             if user.password == password:
-                return user
+                return {'id': doc.id, 'esprofesor': user.esProfesor}
         return None
     except Exception as e:
         print(f"Error authenticating user: {e}")
