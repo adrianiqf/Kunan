@@ -12,12 +12,15 @@ class EstCalendarioSemanal extends StatelessWidget {
     return Scaffold(
 
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         color: const Color.fromRGBO(1,6,24,1),
 
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+
             const SizedBox(height: 20),
             Container(
               margin: const EdgeInsets.only(right: 60),
@@ -137,7 +140,9 @@ class EstCalendarioSemanal extends StatelessWidget {
 
           ],
         ),
+
       ),
+
       bottomNavigationBar: const CustomBottomNavigationBar(
         initialIndex: 1,
         usuario: 'Alumno',

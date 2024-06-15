@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 import 'package:kunan_v01/pantallas/register.dart';
 import 'package:kunan_v01/pantallas/seleccionar_usuario.dart';
 
-import '../Controladores/usario.dart';
+import 'Alumnos/alum_pantalla_principal.dart';
+import 'Profesores/prof_pantalla_principal.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,11 +17,10 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
-
   final TextEditingController _passwordController = TextEditingController();
   bool _passwordVisible = false;
 
-  void _login() {
+  Future<void> _login() async {
     String email = _emailController.text;
     String password = _passwordController.text;
 
@@ -27,22 +30,54 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       return;
     }
-
+/*
     if (!email.endsWith('@unmsm.edu.pe')) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor, ingresa un correo de la UNMSM')),
       );
       return;
     }
-
-    if (usuario.validarUsuario(email, password)) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const SelectUserScreen()),
+*/
+    try {
+      final response = await http.post(
+        Uri.parse('https://kunan.onrender.com/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'correo': email,
+          'password': password,
+        }),
       );
-    } else {
+
+      print(response.statusCode);
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        final responseBody = jsonDecode(response.body);
+        if (responseBody['acceso']=='Acceso exitoso') {
+          if (responseBody['esProfesor']) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ProfMainMenuScreen()),
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const EstMainMenuScreen()),
+            );
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Correo o contraseña incorrectos')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error en el servidor')),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Correo o contraseña incorrectos')),
+        const SnackBar(content: Text('Ocurrió un error')),
       );
     }
   }
@@ -64,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 'KUNAN',
                 style: TextStyle(
                   fontSize: 30,
-                  color: Color.fromRGBO(178,219,144,1),
+                  color: Color.fromRGBO(178, 219, 144, 1),
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -74,8 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
-                      //CORREO
+                      // CORREO
                       const Text(
                         'Correo',
                         style: TextStyle(
@@ -104,12 +138,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             color: Colors.white,
                           ),
                         ),
-
                       ),
-
                       const SizedBox(height: 20),
 
-                      //CONTRASEÑA
+                      // CONTRASEÑA
                       const Text(
                         'Contraseña',
                         style: TextStyle(
@@ -144,24 +176,22 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           ),
-
                           style: const TextStyle(
                             color: Colors.white,
                           ),
                           obscureText: !_passwordVisible,
                         ),
-
                       ),
-
                     ],
                   ),
                 ),
               ),
+              // LOGIN
               const SizedBox(height: 50),
               ElevatedButton(
                 onPressed: _login,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromRGBO(178,219,144,1),
+                  backgroundColor: const Color.fromRGBO(178, 219, 144, 1),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5),
                   ),
