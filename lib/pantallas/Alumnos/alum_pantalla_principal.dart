@@ -29,6 +29,7 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
     super.initState();
     _fetchUserData();
     _fetchCoursedta();
+
   }
 
   Future<void> _fetchUserData() async {
@@ -196,7 +197,7 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Mis Cursos',
+                      ' Mis Cursos',
                       style: TextStyle(
                         fontSize: 40,
                         color: Color.fromRGBO(178,219,144,1),
@@ -206,27 +207,30 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
                     if (_isLoading)
                       const Center(child: CircularProgressIndicator())
                     else
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: _cursos.length,
-                        itemBuilder: (context, index) {
-                        final cursoNombre = _cursos[index];
-                        final siglas = cursoNombre.substring(0, 2).toUpperCase();
-                        final Color color = getRandomLightColor();
-                        const estado = 'Sin estado';
-                        const usuario = 'Alumno';
-
-                        return Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: CursoWidget(
-                              curso: cursoNombre,
-                              siglas: siglas,
-                              color: color,
-                              estado: estado,
-                              usuario: usuario,
-                          ),
-                        );
-                      },
+                      SizedBox(
+                        width: 410,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: _cursos.length,
+                          itemBuilder: (context, index) {
+                          final cursoNombre = _cursos[index];
+                          final siglas = cursoNombre.substring(0, 2).toUpperCase();
+                          final Color color = getRandomLightColor();
+                          const estado = 'Sin estado';
+                          const usuario = 'Alumno';
+                        
+                          return Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: CursoWidget(
+                                curso: cursoNombre,
+                                siglas: siglas,
+                                color: color,
+                                estado: estado,
+                                usuario: usuario,
+                            ),
+                          );
+                        },
+                        ),
                       ),
 
                   ],

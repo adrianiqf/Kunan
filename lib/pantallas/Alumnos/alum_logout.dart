@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:kunan_v01/pantallas/inicio.dart';
 import '../../widgets/custom_navigationbar.dart';
@@ -12,19 +13,12 @@ class EstlogoutScreen extends StatefulWidget {
 }
 
 class _EstlogoutScreenState extends State<EstlogoutScreen> {
-  bool _isEditing = false;
   String _nombre = "";
   String _apellido = "";
   String _correo = "";
   String _escuela = "";
   String _facultad = "";
   bool _isLoading = true;
-
-  final TextEditingController _fullNameController = TextEditingController(text: 'Jose Ruiz Quispe');
-  final TextEditingController _emailController = TextEditingController(text: 'joser@unmsm.edu.pe');
-  final TextEditingController _phoneController = TextEditingController(text: '987546123');
-
-  get http => null;
 
   @override
   void initState() {
@@ -46,10 +40,10 @@ class _EstlogoutScreenState extends State<EstlogoutScreen> {
         final data = jsonDecode(response.body);
         setState(() {
           _nombre = data['nombres'];
-          _apellido = data["apellidos"];
-          _correo = data["correo"];
-          _escuela = data["escuela"];
-          _facultad = data["facultad"];
+          _apellido = data['apellidos'];
+          _correo = data['correo'];
+          _escuela = data['escuela'];
+          _facultad = data['facultad'];
           _isLoading = false;
         });
       } else {
@@ -73,6 +67,9 @@ class _EstlogoutScreenState extends State<EstlogoutScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              if (_isLoading)
+                const Center(child: CircularProgressIndicator())
+              else
               Container(
                 margin: const EdgeInsets.only(top: 100),
                 child: Column(
@@ -84,7 +81,7 @@ class _EstlogoutScreenState extends State<EstlogoutScreen> {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      _nombre,
+                      _nombre, // Mostrar el nombre obtenido del servidor
                       style: const TextStyle(
                         fontSize: 32,
                         color: Colors.white,
@@ -94,6 +91,9 @@ class _EstlogoutScreenState extends State<EstlogoutScreen> {
                   ],
                 ),
               ),
+              if (_isLoading)
+                const Center(child: CircularProgressIndicator())
+              else
               Container(
                 margin: const EdgeInsets.only(top: 60),
                 width: 300,
@@ -109,25 +109,8 @@ class _EstlogoutScreenState extends State<EstlogoutScreen> {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    _isEditing
-                        ? TextField(
-                      controller: _fullNameController,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      decoration: const InputDecoration(
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                      ),
-                    )
-                        : Text(
-                      _fullNameController.text,
+                    Text(
+                      '$_nombre $_apellido', // Mostrar nombre completo
                       style: const TextStyle(
                         fontSize: 20,
                         color: Colors.white,
@@ -144,25 +127,8 @@ class _EstlogoutScreenState extends State<EstlogoutScreen> {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    _isEditing
-                        ? TextField(
-                      controller: _emailController,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      decoration: const InputDecoration(
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                      ),
-                    )
-                        : Text(
-                      _emailController.text,
+                    Text(
+                      _correo, // Mostrar correo electrónico
                       style: const TextStyle(
                         fontSize: 20,
                         color: Colors.white,
@@ -171,7 +137,7 @@ class _EstlogoutScreenState extends State<EstlogoutScreen> {
                     ),
                     const SizedBox(height: 20),
                     const Text(
-                      'Teléfono',
+                      'Escuela',
                       style: TextStyle(
                         fontSize: 28,
                         color: Colors.white,
@@ -179,25 +145,26 @@ class _EstlogoutScreenState extends State<EstlogoutScreen> {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    _isEditing
-                        ? TextField(
-                      controller: _phoneController,
+                    Text(
+                      _escuela, // Mostrar escuela
                       style: const TextStyle(
                         fontSize: 20,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
-                      decoration: const InputDecoration(
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Facultad',
+                      style: TextStyle(
+                        fontSize: 28,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
-                    )
-                        : Text(
-                      _phoneController.text,
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      _facultad, // Mostrar facultad
                       style: const TextStyle(
                         fontSize: 20,
                         color: Colors.white,
@@ -208,32 +175,6 @@ class _EstlogoutScreenState extends State<EstlogoutScreen> {
                 ),
               ),
               const SizedBox(height: 100),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    if (_isEditing) {
-                      // Save the data to persist it
-                      // You can save to a database, API, etc.
-                    }
-                    _isEditing = !_isEditing;
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromRGBO(128, 179, 255, 1),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                ),
-                child: Text(
-                  _isEditing ? 'Guardar' : 'Editar',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(

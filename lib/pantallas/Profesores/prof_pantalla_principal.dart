@@ -193,7 +193,7 @@ class _ProfMainMenuScreenState extends State<ProfMainMenuScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Mis Cursos',
+                        ' Mis Cursos',
                         style: TextStyle(
                           fontSize: 40,
                           color: Color.fromRGBO(178,219,144,1),
@@ -204,27 +204,30 @@ class _ProfMainMenuScreenState extends State<ProfMainMenuScreen> {
                       if (_isLoading)
                         const Center(child: CircularProgressIndicator())
                       else
-                        ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: _cursos.length,
-                          itemBuilder: (context, index) {
-                            final cursoNombre = _cursos[index];
-                            final siglas = cursoNombre.substring(0, 2).toUpperCase();
-                            final Color color = getRandomLightColor();
-                            const estado = 'Sin estado';
-                            const usuario = 'Profesor';
+                        SizedBox(
+                          width: 410,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: _cursos.length,
+                            itemBuilder: (context, index) {
+                              final cursoNombre = _cursos[index];
+                              final siglas = cursoNombre.substring(0, 2).toUpperCase();
+                              final Color color = getRandomLightColor();
+                              const estado = 'Sin estado';
+                              const usuario = 'Profesor';
 
-                            return Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: CursoWidget(
-                                curso: cursoNombre,
-                                siglas: siglas,
-                                color: color,
-                                estado: estado,
-                                usuario: usuario,
-                              ),
-                            );
-                          },
+                              return Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: CursoWidget(
+                                  curso: cursoNombre,
+                                  siglas: siglas,
+                                  color: color,
+                                  estado: estado,
+                                  usuario: usuario,
+                                ),
+                              );
+                            },
+                          ),
                         ),
 
                     ],

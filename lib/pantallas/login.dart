@@ -30,14 +30,14 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       return;
     }
-/*
+
     if (!email.endsWith('@unmsm.edu.pe')) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor, ingresa un correo de la UNMSM')),
       );
       return;
     }
-*/
+
     try {
       final response = await http.post(
         Uri.parse('https://kunan.onrender.com/auth/login'),
