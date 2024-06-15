@@ -87,10 +87,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'facultad': faculty,
         'password': password,
       }),);
+      print(response);
       print(response.statusCode);
       print(response.body);
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         final responseBody = jsonDecode(response.body);
         if (responseBody['success']) {
           ScaffoldMessenger.of(context).showSnackBar(
