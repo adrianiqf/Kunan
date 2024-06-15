@@ -25,7 +25,7 @@ def register():
     
     if result['success']:
         #return jsonify({"message": "Usuario registrado!"}), 201
-        return jsonify({"message": result['message']}), 201
+        return jsonify({"id": result['id'], "message": result['message']}), 201
     else:
         return jsonify({"message": result['message']}), 500
 

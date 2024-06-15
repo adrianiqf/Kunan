@@ -59,7 +59,7 @@ def create_user(db, usuario):
 
         usuario_id = doc_ref[1].id  # Acceder al ID del documento en la tupla devuelta por add()
         usuario.id = usuario_id
-        return {'success': True, 'message': 'Usuario creado correctamente'}
+        return {'success': True, "id": usuario.id,'message': 'Usuario creado correctamente'}
     except Exception as e:
         print(f"Error creating user: {e}")
         return {'success': False, 'message': 'Error creating user: {e}'}
