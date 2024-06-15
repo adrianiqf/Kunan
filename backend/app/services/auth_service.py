@@ -8,9 +8,14 @@ PASSWORD_REGEX = r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$'
 def create_user(db, usuario):
     try:
         # Validar el formato del correo y la contraseña con regex
-        if not re.match(EMAIL_REGEX, usuario.correo) or not re.match(PASSWORD_REGEX, usuario.password):
+        if not re.match(EMAIL_REGEX, usuario.correo):
             print("Error: El formato del correo o la contraseña es inválido.")
-            return {'success': False, 'message': 'Error: El formato del correo o la contraseña es inválido.'}
+            return {'success': False, 'message': 'Error: El formato del correo'}
+            #return False
+        
+        if not re.match(PASSWORD_REGEX, usuario.password):
+            print("Error: La contraseña es inválida.")
+            return {'success': False, 'message': 'La contraseña debe de tener 8 caracteres, al menos un numero y una letra'}
             #return False
         
         campos = [usuario.correo, usuario.password, usuario.nombres, usuario.apellidos, usuario.escuela, usuario.facultad]
