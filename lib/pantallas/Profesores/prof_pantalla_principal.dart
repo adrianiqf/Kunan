@@ -140,7 +140,7 @@ class _ProfMainMenuScreenState extends State<ProfMainMenuScreen> {
                             ),
                             Text(
                               _nombre,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 40,
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,

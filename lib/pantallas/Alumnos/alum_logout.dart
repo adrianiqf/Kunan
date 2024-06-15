@@ -64,16 +64,16 @@ class _EstlogoutScreenState extends State<EstlogoutScreen> {
         width: double.infinity,
         height: double.infinity,
         color: const Color.fromRGBO(1, 6, 24, 1),
-        child: Center( // Envolver todo el contenido en un Center
+        child: Center(
           child: SingleChildScrollView(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center, // Cambiar a center
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (_isLoading)
                   const Center(child: CircularProgressIndicator())
                 else
                   Container(
-                    margin: const EdgeInsets.only(top: 100),
+                    margin: const EdgeInsets.only(top: 60),
                     child: Column(
                       children: [
                         SizedBox(
@@ -83,7 +83,7 @@ class _EstlogoutScreenState extends State<EstlogoutScreen> {
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          _nombre, // Mostrar el nombre obtenido del servidor
+                          _nombre,
                           style: const TextStyle(
                             fontSize: 32,
                             color: Colors.white,
@@ -112,7 +112,7 @@ class _EstlogoutScreenState extends State<EstlogoutScreen> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          '$_nombre $_apellido', // Mostrar nombre completo
+                          '$_nombre $_apellido',
                           style: const TextStyle(
                             fontSize: 20,
                             color: Colors.white,
@@ -130,7 +130,7 @@ class _EstlogoutScreenState extends State<EstlogoutScreen> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          _correo, // Mostrar correo electrónico
+                          _correo,
                           style: const TextStyle(
                             fontSize: 20,
                             color: Colors.white,
@@ -148,7 +148,7 @@ class _EstlogoutScreenState extends State<EstlogoutScreen> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          _escuela, // Mostrar escuela
+                          _escuela,
                           style: const TextStyle(
                             fontSize: 20,
                             color: Colors.white,
@@ -166,7 +166,7 @@ class _EstlogoutScreenState extends State<EstlogoutScreen> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          _facultad, // Mostrar facultad
+                          _facultad,
                           style: const TextStyle(
                             fontSize: 20,
                             color: Colors.white,
