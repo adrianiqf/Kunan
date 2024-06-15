@@ -1,12 +1,22 @@
 
 
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:kunan_v01/widgets/curso_widget.dart';
 import 'package:http/http.dart' as http;
 
 import '../../widgets/custom_navigationbar.dart';
+
+Color getRandomLightColor() {
+  final Random random = Random();
+  final int red = 128 + random.nextInt(128);
+  final int green = 128 + random.nextInt(128);
+  final int blue = 128 + random.nextInt(128);
+
+  return Color.fromARGB(255, red, green, blue);
+}
 
 
 class EstMainMenuScreen extends StatefulWidget {
@@ -18,6 +28,7 @@ class EstMainMenuScreen extends StatefulWidget {
 
 class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
 
+  String _nombre = "";
   List<dynamic> _cursos = [];
   bool _isLoading = true;
 
@@ -25,6 +36,7 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
   void initState() {
     super.initState();
     _fetchUserData();
+    _fetchCoursedta();
   }
 
   Future<void> _fetchUserData() async {
@@ -40,8 +52,37 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         setState(() {
-          _cursos = data['cursos'];
+          _nombre = data['nombres'];
           _isLoading = false;
+        });
+      } else {
+        throw Exception('Error al obtener datos del usuario');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al obtener datos del servidor')),
+      );
+    }
+  }
+
+  Future<void> _fetchCoursedta() async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://kunan.onrender.com/usuario_info/user/OuVmuk1gaojmulu9AnhQ'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      print(response.statusCode);
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final courses = data['cursos'] as List<dynamic>;
+        final courseNames = courses.map((course) => course['nombre'].toString()).toList();
+        setState(() {
+          _cursos = courseNames;
+          _isLoading = false;
+          print(_cursos);
         });
       } else {
         throw Exception('Error al obtener datos del usuario');
@@ -99,10 +140,10 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
                   children: [
                     Container(
                       margin: const EdgeInsets.only(left: 50),
-                      child: const Column(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             '¡Hola!',
                             style: TextStyle(
                               fontSize: 50,
@@ -111,8 +152,8 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
                             ),
                           ),
                           Text(
-                            'José Ruiz', //Nombre de usuario
-                            style: TextStyle(
+                            _nombre,
+                            style: const TextStyle(
                               fontSize: 40,
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -159,10 +200,10 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
                 const SizedBox(height: 30),
 
                 //MIS CURSOS
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Mis Cursos',
                       style: TextStyle(
                         fontSize: 40,
@@ -170,41 +211,32 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
                         //fontWeight: FontWeight.bold,
                       ),
                     ),
+                    if (_isLoading)
+                      const Center(child: CircularProgressIndicator())
+                    else
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: _cursos.length,
+                        itemBuilder: (context, index) {
+                        final cursoNombre = _cursos[index];
+                        final siglas = cursoNombre.substring(0, 2).toUpperCase();
+                        final Color color = getRandomLightColor();
+                        const estado = 'Sin estado';
+                        const usuario = 'Alumno';
 
-                    CursoWidget(
-                        curso: 'Gestión de Riesgos',
-                        siglas: 'GR',
-                        color: Color.fromRGBO(143,152,255,1),
-                        estado: 'ninguno',
-                        usuario: 'Profesor'),
+                        return Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: CursoWidget(
+                              curso: cursoNombre,
+                              siglas: siglas,
+                              color: color,
+                              estado: estado,
+                              usuario: usuario,
+                          ),
+                        );
+                      },
+                      ),
 
-                    SizedBox(height: 30),
-
-                    CursoWidget(
-                        curso: 'Minería de Datos',
-                        siglas: 'MD',
-                        color: Color.fromRGBO(74,210,201,1),
-                        estado: 'ninguno',
-                        usuario: 'Profesor'),
-
-                    SizedBox(height: 30),
-
-                    CursoWidget(
-                        curso: 'Desarrollo de Tesis 1',
-                        siglas: 'DT',
-                        color: Color.fromRGBO(128,179,255,1),
-                        estado: 'ninguno',
-                        usuario: 'Profesor'),
-
-                    SizedBox(height: 30),
-
-                    CursoWidget(
-                      curso: 'Taller de Software Movil',
-                      siglas: 'TM',
-                      color: Color.fromRGBO(255,194,120,1),
-                      estado: 'ninguno',
-                      usuario: 'Alumno',
-                    ),
                   ],
                 ),
 
