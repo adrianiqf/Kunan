@@ -27,7 +27,7 @@ def register():
         #return jsonify({"message": "Usuario registrado!"}), 201
         return jsonify({"message": result['message']}), 201
     else:
-        return jsonify({"message": "Fallo en el registro"}), 500
+        return jsonify({"message": result['message']}), 500
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
