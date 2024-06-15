@@ -207,8 +207,7 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
                     if (_isLoading)
                       const Center(child: CircularProgressIndicator())
                     else
-                      SizedBox(
-                        width: 410,
+                      SingleChildScrollView(
                         child: ListView.builder(
                           shrinkWrap: true,
                           itemCount: _cursos.length,
@@ -218,7 +217,7 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
                           final Color color = getRandomLightColor();
                           const estado = 'Sin estado';
                           const usuario = 'Alumno';
-                        
+
                           return Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: CursoWidget(

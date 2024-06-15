@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:kunan_v01/widgets/curso_widget.dart';
-
+import 'package:http/http.dart' as http;
 import '../../widgets/custom_navigationbar.dart';
 import '../../widgets/random_lightcolor.dart';
 
@@ -19,8 +19,6 @@ class _ProfMainMenuScreenState extends State<ProfMainMenuScreen> {
   String _nombre = "";
   List<dynamic> _cursos = [];
   bool _isLoading = true;
-
-  get http => null;
 
   @override
   void initState() {
@@ -129,10 +127,10 @@ class _ProfMainMenuScreenState extends State<ProfMainMenuScreen> {
                     children: [
                       Container(
                         margin: const EdgeInsets.only(left: 50),
-                        child: const Column(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            const Text(
                               '¡Hola!',
                               style: TextStyle(
                                 fontSize: 50,
@@ -141,7 +139,7 @@ class _ProfMainMenuScreenState extends State<ProfMainMenuScreen> {
                               ),
                             ),
                             Text(
-                              'Rosa Ramos', //Nombre de usuario
+                              _nombre,
                               style: TextStyle(
                                 fontSize: 40,
                                 color: Colors.white,
