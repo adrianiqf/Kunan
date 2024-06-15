@@ -52,7 +52,8 @@ def register_student_service(db, id_usuario, id_curso):
         # Verificar si el curso existe
         if not curso:
             print("Error: El curso no existe.")
-            return False
+            return {'success': False, 'message': f'Error: El curso no existe'}
+            #return False
 
         # Obtener el usuario
         usuario_ref = db.collection('usuario').document(id_usuario)
@@ -61,12 +62,14 @@ def register_student_service(db, id_usuario, id_curso):
         # Verificar si el usuario existe
         if not usuario:
             print("Error: El usuario no existe.")
-            return False
+            return {'success': False, 'message': f'Error: El usuario no existe'}
+            #return False
 
         # Verificar si el usuario es un estudiante
         if usuario['esProfesor']:
             print("Error: El usuario no es un estudiante.")
-            return False
+            return {'success': False, 'message': f'Error: El usuario no es un estudiante'}
+            #return False
 
         # Verificar si el estudiante ya está matriculado en el curso
         existing_student_ref = db.collection('curso').document(id_curso).collection('matriculados').where(filter=FieldFilter('id_usuario', '==', id_usuario))
@@ -84,9 +87,14 @@ def register_student_service(db, id_usuario, id_curso):
             "id_usuario": id_usuario,
             # Añade otros campos del estudiante aquí si es necesario
         })
+        #usuario_ref.collection('cursos').add({
+            #"id_curso": id_curso,
+        #})
 
         return {'success': True, 'message': f'Estudiante matriculado con éxito en el curso'}
 
     except Exception as e:
         print(f"Error registering student: {e}")
-        return False
+        return {'success': False, 'message': f'Error registering student: {e}'}
+        #return False
+    

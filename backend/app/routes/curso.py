@@ -52,3 +52,4 @@ def register():
         return jsonify({"message": "Estudiante registrado exitosamente"}), 201
     else:
         return jsonify({"message": result['message']}), 400
+    
