@@ -71,19 +71,22 @@ def authenticate_user(db, correo, password):
         # Validar el formato del correo electrónico
         if not re.match(EMAIL_REGEX, correo):
             print("Formato de correo electrónico inválido")
-            return None
+            return {"success": False, "message": "Formato de correo electrónico inválido"}
+            #return None
         
         # Validar que el dominio del correo electrónico sea unmsm.edu.pe
         if not correo.endswith(f"@{UNMSM_DOMAIN}"):
             print("El correo electrónico no pertenece a unmsm.edu.pe")
-            return None
+            return {"success": False, "message": "El correo electrónico no pertenece a unmsm.edu.pe"}
+            #return None
         
         user_ref = db.collection('usuario').where('correo', '==', correo).limit(1).stream()
         for doc in user_ref:
             user = Usuario.from_dict(doc.to_dict())
             if user.password == password:
-                return {'id': doc.id, 'esprofesor': user.esProfesor}
-        return None
+                return {"success": True, "id": doc.id, "esprofesor": user.esProfesor}
+        return {"success": False, "message": "Credenciales incorrectas"}
     except Exception as e:
         print(f"Error authenticating user: {e}")
-        return None
+        return {"success": False, "message": f"Error authenticating user: {e}"}
+       #return None

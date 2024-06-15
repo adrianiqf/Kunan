@@ -38,8 +38,10 @@ def login():
     password = data['password']
     
     user = authenticate_user(db, correo, password)
+
+    print(user)
     
-    if user:
+    if user['success']:
         return jsonify({"id": user['id'], "esProfesor": user['esprofesor'], "acceso": "Acceso exitoso"}), 200
     else:
-        return jsonify({"error": "Credenciales inválidas"}), 401
+        return jsonify({"error": user['message']}), 401
