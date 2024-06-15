@@ -59,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
           if (responseBody['esProfesor']) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const ProfMainMenuScreen()),
+              MaterialPageRoute(builder: (context) =>  ProfMainMenuScreen(idUsuario: responseBody['id'])),
             );
           } else {
             Navigator.push(
