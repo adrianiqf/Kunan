@@ -1,7 +1,10 @@
 
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:kunan_v01/widgets/curso_widget.dart';
+import 'package:http/http.dart' as http;
 
 import '../../widgets/custom_navigationbar.dart';
 
@@ -14,6 +17,42 @@ class EstMainMenuScreen extends StatefulWidget {
 }
 
 class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
+
+  List<dynamic> _cursos = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://kunan.onrender.com/usuario_info/info/OuVmuk1gaojmulu9AnhQ'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      print(response.statusCode);
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          _cursos = data['cursos'];
+          _isLoading = false;
+        });
+      } else {
+        throw Exception('Error al obtener datos del usuario');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al obtener datos del servidor')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

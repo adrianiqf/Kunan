@@ -60,7 +60,7 @@ class ProflogoutScreen extends StatelessWidget {
       ),
       bottomNavigationBar: const CustomBottomNavigationBar(
         initialIndex: 2,
-        usuario: 'Alumno',
+        usuario: 'Profesor',
       ),
     );
 
