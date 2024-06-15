@@ -44,7 +44,7 @@ class _AlumTomarAsistenciaState extends State<AlumTomarAsistencia> {
               children: [
                 GestureDetector(
                   onTap: ()  {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const EstMainMenuScreen()));
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const EstMainMenuScreen(idUsuario: 'OuVmuk1gaojmulu9AnhQ')));
                   },
                   child: const Row(
                     children: [

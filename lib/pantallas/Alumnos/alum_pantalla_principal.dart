@@ -12,7 +12,9 @@ import '../../widgets/random_lightcolor.dart';
 
 
 class EstMainMenuScreen extends StatefulWidget {
-  const EstMainMenuScreen({super.key});
+  final String idUsuario;
+
+  const EstMainMenuScreen({super.key, required this.idUsuario});
 
   @override
   State<EstMainMenuScreen> createState() => _EstMainMenuScreenState();
@@ -35,7 +37,7 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
   Future<void> _fetchUserData() async {
     try {
       final response = await http.get(
-        Uri.parse('https://kunan.onrender.com/usuario_info/info/OuVmuk1gaojmulu9AnhQ'),
+        Uri.parse('https://kunan.onrender.com/usuario_info/info/${widget.idUsuario}'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -61,7 +63,7 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
   Future<void> _fetchCoursedta() async {
     try {
       final response = await http.get(
-        Uri.parse('https://kunan.onrender.com/usuario_info/user/OuVmuk1gaojmulu9AnhQ'),
+        Uri.parse('https://kunan.onrender.com/usuario_info/user/${widget.idUsuario}'),
         headers: {'Content-Type': 'application/json'},
       );
 

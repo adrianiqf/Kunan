@@ -30,7 +30,7 @@ class CustomBottomNavigationBar extends StatefulWidget {
         };
       case 'Alumno':
         return {
-          '/home_alumno': const EstMainMenuScreen(),
+          '/home_alumno': const EstMainMenuScreen(idUsuario: 'OuVmuk1gaojmulu9AnhQ'),
           '/calendar_alumno': const EstCalendarioSemanal(),
           '/settings_alumno': const EstlogoutScreen(),
         };

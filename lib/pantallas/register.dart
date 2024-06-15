@@ -96,6 +96,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       if (response.statusCode == 201) {
         final responseBody = jsonDecode(response.body);
+        print(responseBody);
         if (responseBody['message']=="Usuario creado correctamente") {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Registro exitoso')),
@@ -108,7 +109,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           } else {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const EstMainMenuScreen()),
+              MaterialPageRoute(builder: (context) => EstMainMenuScreen(idUsuario: responseBody['id'])),
             );
           }
         } else {

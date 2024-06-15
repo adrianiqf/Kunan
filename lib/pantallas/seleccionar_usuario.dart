@@ -33,7 +33,7 @@ class SelectUserScreen extends StatelessWidget {
 
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const EstMainMenuScreen()),
+                    MaterialPageRoute(builder: (context) => const EstMainMenuScreen(idUsuario: 'OuVmuk1gaojmulu9AnhQ')),
                   );
 
 

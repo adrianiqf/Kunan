@@ -47,12 +47,14 @@ class _LoginScreenState extends State<LoginScreen> {
           'password': password,
         }),
       );
-
+      print(response);
       print(response.statusCode);
       print(response.body);
 
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
+        print('ResponseBody');
+        print(responseBody);
         if (responseBody['acceso']=='Acceso exitoso') {
           if (responseBody['esProfesor']) {
             Navigator.push(
@@ -62,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
           } else {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const EstMainMenuScreen()),
+              MaterialPageRoute(builder: (context) => EstMainMenuScreen(idUsuario: responseBody['id'])),
             );
           }
         } else {
