@@ -4,6 +4,9 @@ import 'dart:convert';
 
 import 'package:kunan_v01/pantallas/seleccionar_usuario.dart';
 
+import 'Alumnos/alum_pantalla_principal.dart';
+import 'Profesores/prof_pantalla_principal.dart';
+
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -21,7 +24,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _schoolController = TextEditingController();
   final TextEditingController _facultyController = TextEditingController();
   bool _passwordVisible = false;
-  bool _isProfessor = false;
+  bool _esProfesor = false;
 
   Future<void> _register() async {
     String email = _emailController.text;
@@ -48,9 +51,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    if (password.length < 6) {
+    if (!RegExp(r'^(?=.*[0-9])(?=.*[a-zA-Z]).{8}$').hasMatch(password)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('La contraseña debe tener al menos 6 caracteres')),
+        const SnackBar(content: Text('La contraseña debe tener al menos 8 caracteres, una letra y un número')),
       );
       return;
     }
@@ -71,7 +74,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           'apellidos': lastName,
           'codigo': code,
           'correo': email,
-          'esProfesor': _isProfessor,
+          'esProfesor': _esProfesor,
           'escuela': school,
           'facultad': faculty,
           'password': password,
@@ -82,7 +85,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'apellidos': lastName,
         'codigo': code,
         'correo': email,
-        'esProfesor': _isProfessor,
+        'esProfesor': _esProfesor,
         'escuela': school,
         'facultad': faculty,
         'password': password,
@@ -93,14 +96,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       if (response.statusCode == 201) {
         final responseBody = jsonDecode(response.body);
-        if (responseBody['success']) {
+        if (responseBody['message']=="Usuario creado correctamente") {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Registro exitoso')),
           );
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const SelectUserScreen()),
-          );
+          if (_esProfesor) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ProfMainMenuScreen()),
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const EstMainMenuScreen()),
+            );
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(responseBody['message'] ?? 'Error al registrar el usuario')),
@@ -325,10 +335,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           'Sí',
                           style: TextStyle(color: Colors.white),
                         ),
-                        value: _isProfessor,
+                        value: _esProfesor,
                         onChanged: (bool? value) {
                           setState(() {
-                            _isProfessor = value!;
+                            _esProfesor = value!;
                           });
                         },
                         checkColor: Colors.white,

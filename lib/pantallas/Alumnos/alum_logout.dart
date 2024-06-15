@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:kunan_v01/pantallas/inicio.dart';
 import '../../widgets/custom_navigationbar.dart';
@@ -11,10 +13,54 @@ class EstlogoutScreen extends StatefulWidget {
 
 class _EstlogoutScreenState extends State<EstlogoutScreen> {
   bool _isEditing = false;
+  String _nombre = "";
+  String _apellido = "";
+  String _correo = "";
+  String _escuela = "";
+  String _facultad = "";
+  bool _isLoading = true;
 
   final TextEditingController _fullNameController = TextEditingController(text: 'Jose Ruiz Quispe');
   final TextEditingController _emailController = TextEditingController(text: 'joser@unmsm.edu.pe');
   final TextEditingController _phoneController = TextEditingController(text: '987546123');
+
+  get http => null;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://kunan.onrender.com/usuario_info/info/OuVmuk1gaojmulu9AnhQ'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      print(response.statusCode);
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          _nombre = data['nombres'];
+          _apellido = data["apellidos"];
+          _correo = data["correo"];
+          _escuela = data["escuela"];
+          _facultad = data["facultad"];
+          _isLoading = false;
+        });
+      } else {
+        throw Exception('Error al obtener datos del usuario');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al obtener datos del servidor')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +83,9 @@ class _EstlogoutScreenState extends State<EstlogoutScreen> {
                       child: Image.asset('assets/imagenes/fotoperfil2.png'),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
-                      'Jose Ruiz',
-                      style: TextStyle(
+                    Text(
+                      _nombre,
+                      style: const TextStyle(
                         fontSize: 32,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,

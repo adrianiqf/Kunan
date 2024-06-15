@@ -8,15 +8,7 @@ import 'package:kunan_v01/widgets/curso_widget.dart';
 import 'package:http/http.dart' as http;
 
 import '../../widgets/custom_navigationbar.dart';
-
-Color getRandomLightColor() {
-  final Random random = Random();
-  final int red = 128 + random.nextInt(128);
-  final int green = 128 + random.nextInt(128);
-  final int blue = 128 + random.nextInt(128);
-
-  return Color.fromARGB(255, red, green, blue);
-}
+import '../../widgets/random_lightcolor.dart';
 
 
 class EstMainMenuScreen extends StatefulWidget {
