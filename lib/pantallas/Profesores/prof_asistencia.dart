@@ -1,5 +1,7 @@
+
 import 'dart:async';
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:kunan_v01/pantallas/Profesores/prof_reporte_asistencia.dart';
@@ -20,6 +22,11 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
   BluetoothDevice? selectedDevice;
   List<BluetoothService> services = [];
   bool isConnecting = false;
+
+  static const String SERVICE_UUID_CAMBIO_ESTADO =
+      "2da27884-06ee-4a0d-9102-9eadb3e6629c";
+  static const String CHARACTERISTIC_UUID_CAMBIO_ESTADO =
+      "11111111-1111-1111-1111-111111111112";
 
   @override
   void initState() {
@@ -111,6 +118,47 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
       setState(() {
         isConnecting = false;
       });
+    }
+  }
+
+  Future<void> _iniciarAsistencia() async {
+    if (selectedDevice == null) {
+      print('No hay dispositivo seleccionado');
+      return;
+    }
+
+    try {
+      BluetoothService? targetService;
+      for (var service in services) {
+        print(service);
+        if (service.uuid.toString() == SERVICE_UUID_CAMBIO_ESTADO) {
+          targetService = service;
+          break;
+        }
+      }
+
+      if (targetService == null) {
+        print('Servicio no encontrado');
+        return;
+      }
+
+      BluetoothCharacteristic? targetCharacteristic;
+      for (var characteristic in targetService.characteristics) {
+        if (characteristic.uuid.toString() == CHARACTERISTIC_UUID_CAMBIO_ESTADO) {
+          targetCharacteristic = characteristic;
+          break;
+        }
+      }
+
+      if (targetCharacteristic == null) {
+        print('Característica no encontrada');
+        return;
+      }
+
+      await targetCharacteristic.write(utf8.encode('start'));
+      print('Se envió "start" a la característica');
+    } catch (e) {
+      print('Error al iniciar asistencia: $e');
     }
   }
 
@@ -269,7 +317,7 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                         children: [
                           Expanded(
                             child: ElevatedButton(
-                              onPressed: () {},
+                              onPressed: _iniciarAsistencia,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
                                     const Color.fromRGBO(128, 179, 255, 1),
