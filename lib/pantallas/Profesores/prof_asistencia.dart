@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
@@ -27,6 +26,11 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
       "2da27884-06ee-4a0d-9102-9eadb3e6629c";
   static const String CHARACTERISTIC_UUID_CAMBIO_ESTADO =
       "11111111-1111-1111-1111-111111111112";
+
+  static const String SERVICE_UUID_LEER =
+      "c4997186-5979-40ae-81ec-013a0a4313e2";
+  static const String CHARACTERISTIC_UUID_LEER =
+      "33333333-3333-3333-3333-333333333334";
 
   @override
   void initState() {
@@ -144,7 +148,8 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
 
       BluetoothCharacteristic? targetCharacteristic;
       for (var characteristic in targetService.characteristics) {
-        if (characteristic.uuid.toString() == CHARACTERISTIC_UUID_CAMBIO_ESTADO) {
+        if (characteristic.uuid.toString() ==
+            CHARACTERISTIC_UUID_CAMBIO_ESTADO) {
           targetCharacteristic = characteristic;
           break;
         }
@@ -159,6 +164,86 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
       print('Se envió "start" a la característica');
     } catch (e) {
       print('Error al iniciar asistencia: $e');
+    }
+  }
+
+  Future<void> _cerrarAsistencia() async {
+    if (selectedDevice == null) {
+      print('No hay dispositivo seleccionado');
+      return;
+    }
+
+    try {
+      // Primero, enviamos 'stop' al servicio de cambio de estado
+      BluetoothService? targetService;
+      for (var service in services) {
+        print(service);
+        if (service.uuid.toString() == SERVICE_UUID_CAMBIO_ESTADO) {
+          targetService = service;
+          break;
+        }
+      }
+
+      if (targetService == null) {
+        print('Servicio de cambio de estado no encontrado');
+        return;
+      }
+
+      BluetoothCharacteristic? targetCharacteristic;
+      for (var characteristic in targetService.characteristics) {
+        if (characteristic.uuid.toString() ==
+            CHARACTERISTIC_UUID_CAMBIO_ESTADO) {
+          targetCharacteristic = characteristic;
+          break;
+        }
+      }
+
+      if (targetCharacteristic == null) {
+        print('Característica de cambio de estado no encontrada');
+        return;
+      }
+
+      await targetCharacteristic.write(utf8.encode('stop'));
+      print('Se envió "stop" a la característica de cambio de estado');
+
+      // Ahora, leemos la lista de asistentes del servicio de lectura
+      BluetoothService? leerService;
+      for (var service in services) {
+        print(service);
+        if (service.uuid.toString() == "c4997186-5979-40ae-81ec-013a0a4313e2") {
+          leerService = service;
+          break;
+        }
+      }
+
+      if (leerService == null) {
+        print('Servicio de lectura no encontrado');
+        return;
+      }
+
+      BluetoothCharacteristic? leerCharacteristic;
+      for (var characteristic in leerService.characteristics) {
+        if (characteristic.uuid.toString() ==
+            "33333333-3333-3333-3333-333333333334") {
+          leerCharacteristic = characteristic;
+          break;
+        }
+      }
+
+      if (leerCharacteristic == null) {
+        print('Característica de lectura no encontrada');
+        return;
+      }
+      //convetimos en una lista los codigos que nos devuelve
+      List<int> value = await leerCharacteristic.read();
+      String asistentes = utf8.decode(value);
+      print('Lista de asistentes:');
+      print(asistentes.runtimeType);
+      print(asistentes);
+
+      // logica para crear la lista de asistentes
+    } catch (e) {
+      print('Error al cerrar asistencia: $e');
     }
   }
 
@@ -345,7 +430,7 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                           const SizedBox(width: 10),
                           Expanded(
                             child: ElevatedButton(
-                              onPressed: () {},
+                              onPressed: _cerrarAsistencia,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
                                     const Color.fromRGBO(128, 179, 255, 1),

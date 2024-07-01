@@ -4,7 +4,6 @@ import '../../Controladores/save_preferences.dart';
 import '../../widgets/custom_navigationbar.dart';
 
 class AlumTomarAsistencia extends StatefulWidget {
-
   const AlumTomarAsistencia({super.key});
 
   @override
@@ -13,22 +12,133 @@ class AlumTomarAsistencia extends StatefulWidget {
 
 class _AlumTomarAsistenciaState extends State<AlumTomarAsistencia> {
   bool asistenciaMarcada = false;
+  List<ScanResult> devices = [];
+  BluetoothAdapterState _adapterState = BluetoothAdapterState.unknown;
+  late StreamSubscription<BluetoothAdapterState> _adapterStateSubscription;
+  BluetoothDevice? selectedDevice;
+  List<BluetoothService> services = [];
+  bool isConnecting = false;
 
+  static const String SERVICE_UUID_REGISTRAR =
+      "68cce3a1-a94d-4b2f-Ac00-747066e80f05";
+  static const String CHARACTERISTIC_UUID_REGISTRAR =
+      "22222222-2222-2222-2222-222222222223";
 
   @override
   void initState() {
     super.initState();
-    _loadAsistenciaMarcada();
+    _initBluetooth();
   }
 
-  Future<void> _loadAsistenciaMarcada() async {
-    bool? marcada = await SharedPrefUtils.getBool("asistenciaMarcada");
-    if (marcada != null && marcada) {
+  void _initBluetooth() async {
+    if (await FlutterBluePlus.isSupported == false) {
+      print("Bluetooth no es compatible con este dispositivo");
+      return;
+    }
+
+    _adapterStateSubscription =
+        FlutterBluePlus.adapterState.listen((BluetoothAdapterState state) {
+          setState(() {
+            _adapterState = state;
+          });
+          if (state == BluetoothAdapterState.on) {
+            _startScan();
+          } else {
+            _showBluetoothOffDialog();
+          }
+        });
+
+    if (Platform.isAndroid) {
+      try {
+        await FlutterBluePlus.turnOn();
+      } catch (e) {
+        print("No se pudo activar el Bluetooth: $e");
+      }
+    }
+  }
+
+  void _startScan() async {
+    if (_adapterState != BluetoothAdapterState.on) return;
+
+    setState(() {
+      devices.clear();
+    });
+
+    try {
+      await FlutterBluePlus.startScan(timeout: Duration(seconds: 4));
+      FlutterBluePlus.scanResults.listen((results) {
+        setState(() {
+          devices = results;
+        });
+      });
+    } catch (e) {
+      print('Error al escanear dispositivos BLE: $e');
+    }
+  }
+
+  Future<void> _connectToDevice() async {
+    if (selectedDevice == null) return;
+
+    setState(() {
+      isConnecting = true;
+    });
+
+    try {
+      await selectedDevice!.connect();
+      services = await selectedDevice!.discoverServices();
+      setState(() {});
+    } catch (e) {
+      print('Error al conectar con el dispositivo: $e');
+    } finally {
       setState(() {
-        asistenciaMarcada = marcada;
+        isConnecting = false;
       });
     }
   }
+
+  Future<void> _registrarAsistencia() async {
+    if (selectedDevice == null) {
+      print('No hay dispositivo seleccionado');
+      return;
+    }
+
+    try {
+      BluetoothService? targetService;
+      for (var service in services) {
+        print(service);
+        if (service.uuid.toString() == SERVICE_UUID_CAMBIO_ESTADO) {
+          targetService = service;
+          break;
+        }
+      }
+
+      if (targetService == null) {
+        print('Servicio no encontrado');
+        return;
+      }
+
+      BluetoothCharacteristic? targetCharacteristic;
+      for (var characteristic in targetService.characteristics) {
+        if (characteristic.uuid.toString() ==
+            CHARACTERISTIC_UUID_CAMBIO_ESTADO) {
+          targetCharacteristic = characteristic;
+          break;
+        }
+      }
+
+      if (targetCharacteristic == null) {
+        print('Característica no encontrada');
+        return;
+      }
+
+      await targetCharacteristic.write(utf8.encode('start'));
+      print('Se envió "start" a la característica');
+    } catch (e) {
+      print('Error al iniciar asistencia: $e');
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -43,8 +153,12 @@ class _AlumTomarAsistenciaState extends State<AlumTomarAsistencia> {
             Column(
               children: [
                 GestureDetector(
-                  onTap: ()  {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const EstMainMenuScreen(idUsuario: 'OuVmuk1gaojmulu9AnhQ')));
+                  onTap: () {
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const EstMainMenuScreen(
+                                idUsuario: 'OuVmuk1gaojmulu9AnhQ')));
                   },
                   child: const Row(
                     children: [
@@ -185,12 +299,13 @@ class _AlumTomarAsistenciaState extends State<AlumTomarAsistencia> {
                             onPressed: () {
                               setState(() {
                                 asistenciaMarcada = true;
-                                SharedPrefUtils.saveBool("asistenciaMarcada", asistenciaMarcada);
+                                SharedPrefUtils.saveBool(
+                                    "asistenciaMarcada", asistenciaMarcada);
                               });
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor:
-                              const Color.fromRGBO(128, 179, 255, 1),
+                                  const Color.fromRGBO(128, 179, 255, 1),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
                               ),
@@ -245,7 +360,6 @@ class _AlumTomarAsistenciaState extends State<AlumTomarAsistencia> {
                   ],
                 ),
               )
-
           ],
         ),
       ),
