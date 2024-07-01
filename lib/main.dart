@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:kunan_v01/pantallas/inicio.dart';
-
+//import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'Controladores/save_preferences.dart';
 
 void main() {
+  //FlutterBluePlus.setLogLevel(LogLevel.verbose, color: true);
   runApp(const MyApp());
 }
 
@@ -17,11 +18,8 @@ class MyApp extends StatelessWidget {
       //home: InicioScreen(),
       home: AnimatedSplashScreen(),
     );
-
   }
 }
-
-
 
 class AnimatedSplashScreen extends StatefulWidget {
   const AnimatedSplashScreen({super.key});
@@ -30,7 +28,8 @@ class AnimatedSplashScreen extends StatefulWidget {
   _AnimatedSplashScreenState createState() => _AnimatedSplashScreenState();
 }
 
-class _AnimatedSplashScreenState extends State<AnimatedSplashScreen> with SingleTickerProviderStateMixin {
+class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -53,6 +52,7 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen> with Single
   void _clearSharedPreferences() async {
     await SharedPrefUtils.clearData();
   }
+
 
   @override
   Widget build(BuildContext context) {

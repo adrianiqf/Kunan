@@ -38,6 +38,7 @@ dependencies:
   scrollable_table_view: ^2.0.3
   flutter_adaptive_scaffold: ^0.1.11
   http: ^1.2.1
+  flutter_blue_plus: ^1.32.8
 
 dev_dependencies:
   flutter_test:
