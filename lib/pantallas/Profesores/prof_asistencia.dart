@@ -1,20 +1,22 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:kunan_v01/pantallas/Profesores/prof_reporte_asistencia.dart';
 import 'package:kunan_v01/widgets/estudiantes_widget.dart';
+
 import '../../widgets/custom_navigationbar.dart';
 
 class ProfTomarAsistencia extends StatefulWidget {
   const ProfTomarAsistencia({super.key});
 
   @override
-  _ProfTomarAsistenciaState createState() => _ProfTomarAsistenciaState();
+  State<ProfTomarAsistencia> createState() => _ProfTomarAsistenciaState();
 }
 
 class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
+
   List<ScanResult> devices = [];
   BluetoothAdapterState _adapterState = BluetoothAdapterState.unknown;
   late StreamSubscription<BluetoothAdapterState> _adapterStateSubscription;
@@ -26,7 +28,6 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
       "2da27884-06ee-4a0d-9102-9eadb3e6629c";
   static const String CHARACTERISTIC_UUID_CAMBIO_ESTADO =
       "11111111-1111-1111-1111-111111111112";
-
   static const String SERVICE_UUID_LEER =
       "c4997186-5979-40ae-81ec-013a0a4313e2";
   static const String CHARACTERISTIC_UUID_LEER =
@@ -46,15 +47,15 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
 
     _adapterStateSubscription =
         FlutterBluePlus.adapterState.listen((BluetoothAdapterState state) {
-      setState(() {
-        _adapterState = state;
-      });
-      if (state == BluetoothAdapterState.on) {
-        _startScan();
-      } else {
-        _showBluetoothOffDialog();
-      }
-    });
+          setState(() {
+            _adapterState = state;
+          });
+          if (state == BluetoothAdapterState.on) {
+            _startScan();
+          } else {
+            _showBluetoothOffDialog();
+          }
+        });
 
     if (Platform.isAndroid) {
       try {
@@ -70,12 +71,12 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Bluetooth desactivado'),
+          title: const Text('Bluetooth desactivado'),
           content:
-              Text('Por favor, active el Bluetooth para usar esta función.'),
+          const Text('Por favor, active el Bluetooth para usar esta función.'),
           actions: <Widget>[
             TextButton(
-              child: Text('OK'),
+              child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -148,8 +149,7 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
 
       BluetoothCharacteristic? targetCharacteristic;
       for (var characteristic in targetService.characteristics) {
-        if (characteristic.uuid.toString() ==
-            CHARACTERISTIC_UUID_CAMBIO_ESTADO) {
+        if (characteristic.uuid.toString() == CHARACTERISTIC_UUID_CAMBIO_ESTADO) {
           targetCharacteristic = characteristic;
           break;
         }
@@ -255,80 +255,87 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
+    final size = MediaQuery.of(context).size;
 
     return Scaffold(
       body: Container(
-        height: double.infinity,
         color: const Color.fromRGBO(1, 6, 24, 1),
-        padding: EdgeInsets.only(top: 30, left: screenSize.width * 0.1),
+        padding: EdgeInsets.only(top: size.height * 0.03, left: size.width * 0.09, right: size.width * 0.09),
+        width: double.infinity,
+        height: double.infinity,
+
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: const Row(
-                  children: [
-                    Icon(
-                      Icons.arrow_left_outlined,
-                      size: 36,
-                      color: Colors.white,
+              // LOGO
+              Column(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.arrow_left_outlined,
+                          size: size.width * 0.07,
+                          color: Colors.white,
+                        ),
+                        const Text(
+                          'Volver',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      'Volver',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: size.height * 0.02),
               Container(
-                margin: EdgeInsets.only(right: screenSize.width * 0.2),
-                child: const Text(
+                margin: EdgeInsets.only(right: size.width * 0.1),
+                child: Text(
                   'Iniciar Asistencia',
                   style: TextStyle(
-                    fontSize: 40,
-                    color: Color.fromRGBO(178, 219, 144, 1),
+                    fontSize: size.width * 0.09,
+                    color: const Color.fromRGBO(178, 219, 144, 1),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
-              const SizedBox(height: 30),
-              const Text(
+              SizedBox(height: size.height * 0.03),
+              Text(
                 'Clase:',
                 style: TextStyle(
-                  fontSize: 25,
-                  color: Color.fromRGBO(178, 219, 144, 1),
+                  fontSize: size.width * 0.05,
+                  color: const Color.fromRGBO(178, 219, 144, 1),
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 20),
-              const Text(
+              SizedBox(height: size.height * 0.02),
+              Text(
                 'Taller de Software Móvil',
                 style: TextStyle(
-                  fontSize: 25,
+                  fontSize: size.width * 0.055,
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(height: 30),
-              const Text(
+              SizedBox(height: size.height * 0.03),
+               Text(
                 'Horario de Asistencia',
                 style: TextStyle(
-                  fontSize: 25,
-                  color: Color.fromRGBO(178, 219, 144, 1),
+                  fontSize: size.width * 0.05,
+                  color: const Color.fromRGBO(178, 219, 144, 1),
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 30),
+              SizedBox(height: size.height * 0.031),
               Container(
-                width: screenSize.width * 0.9,
+                width: size.width * 0.9,
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.white, width: 2),
                   borderRadius: BorderRadius.circular(20),
@@ -337,59 +344,59 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      margin: const EdgeInsets.only(top: 10),
-                      child: const Row(
+                      margin: EdgeInsets.only(top: size.height * 0.01),
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             'Inicio',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 30,
+                              fontSize: size.width * 0.063,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(width: 120),
+                          SizedBox(width: size.width * 0.2),
                           Text(
                             'Fin',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 30,
+                              fontSize: size.width * 0.063,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: size.height * 0.01),
                     Container(
-                      margin: const EdgeInsets.only(left: 25),
-                      width: screenSize.width * 0.8,
+                      margin: EdgeInsets.only(left: size.width * 0.05),
+                      width: size.width * 0.7,
                       child: const Divider(
                         thickness: 1,
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: size.height * 0.02),
                     Container(
-                      margin: const EdgeInsets.only(top: 10),
-                      child: const Row(
+                      margin: EdgeInsets.only(top: size.height * 0.01),
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             '10:00',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 30,
+                              fontSize: size.width * 0.063,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(width: 120),
+                          SizedBox(width: size.width * 0.22),
                           Text(
                             '10:10',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 30,
+                              fontSize: size.width * 0.063,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -397,28 +404,27 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                       ),
                     ),
                     Container(
-                      margin: const EdgeInsets.all(10),
+                      margin: EdgeInsets.all(size.width * 0.021),
                       child: Row(
                         children: [
                           Expanded(
                             child: ElevatedButton(
                               onPressed: _iniciarAsistencia,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    const Color.fromRGBO(128, 179, 255, 1),
+                                backgroundColor: const Color.fromRGBO(128, 179, 255, 1),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5),
                                 ),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.login, color: Colors.white),
-                                  SizedBox(width: 10),
+                                  const Icon(Icons.login, color: Colors.white),
+                                  SizedBox(width: size.width * 0.011),
                                   Text(
                                     'Iniciar',
                                     style: TextStyle(
-                                      fontSize: 20,
+                                      fontSize:  size.width * 0.05,
                                       color: Colors.black,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -427,26 +433,25 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          SizedBox(width: size.width * 0.01),
                           Expanded(
                             child: ElevatedButton(
                               onPressed: _cerrarAsistencia,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    const Color.fromRGBO(128, 179, 255, 1),
+                                backgroundColor: const Color.fromRGBO(128, 179, 255, 1),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5),
                                 ),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.logout, color: Colors.white),
-                                  SizedBox(width: 8),
+                                  const Icon(Icons.logout, color: Colors.white),
+                                  SizedBox(width:  size.width * 0.0011),
                                   Text(
                                     'Cancelar',
                                     style: TextStyle(
-                                      fontSize: 20,
+                                      fontSize:  size.width * 0.05,
                                       color: Colors.black,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -461,13 +466,12 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                   ],
                 ),
               ),
-              const SizedBox(height: 40),
+              SizedBox(height: size.height * 0.04),
               GestureDetector(
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => const ProfReporteAsistencia()),
+                    MaterialPageRoute(builder: (context) => const ProfReporteAsistencia()),
                   );
                 },
                 child: const Text(
@@ -479,18 +483,18 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                   ),
                 ),
               ),
-              const SizedBox(height: 30),
+              SizedBox(height: size.height * 0.03),
               DropdownButton<BluetoothDevice>(
                 value: selectedDevice,
-                hint: Text('Seleccionar dispositivo',
+                hint: const Text('Seleccionar dispositivo',
                     style: TextStyle(color: Colors.white)),
-                dropdownColor: Color.fromRGBO(1, 6, 24, 1),
+                dropdownColor: const Color.fromRGBO(1, 6, 24, 1),
                 items: devices.map((result) {
                   return DropdownMenuItem(
                     value: result.device,
                     child: Text(
                       result.device.platformName ?? 'Dispositivo desconocido',
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   );
                 }).toList(),
@@ -500,20 +504,21 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                   });
                 },
               ),
-              SizedBox(height: 20),
+              SizedBox(height: size.height * 0.02),
               ElevatedButton(
                 onPressed: isConnecting ? null : _connectToDevice,
-                child: Text(
-                    isConnecting ? 'Conectando...' : 'Conectar al dispositivo'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromRGBO(128, 179, 255, 1),
+                  backgroundColor: const Color.fromRGBO(128, 179, 255, 1),
                   foregroundColor: Colors.black,
                 ),
+                child: Text(
+                    isConnecting ? 'Conectando...' : 'Conectar al dispositivo'),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: size.height * 0.02),
               Container(
-                width: screenSize.width * 0.8,
-                height: 200,
+                margin: EdgeInsets.only(left: size.width * 0.01),
+                width: size.width * 0.8,
+                height: size.height * 0.2,
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.white),
                   borderRadius: BorderRadius.circular(10),
@@ -525,21 +530,21 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                       services.isEmpty
                           ? 'No hay servicios disponibles'
                           : services.map((s) => s.uuid.toString()).join('\n'),
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 30),
-              const Text(
+              SizedBox(height: size.height * 0.03),
+              Text(
                 'Estudiantes inasistentes:',
                 style: TextStyle(
-                  fontSize: 22,
-                  color: Color.fromRGBO(178, 219, 144, 1),
+                  fontSize: size.width * 0.05,
+                  color: const Color.fromRGBO(178, 219, 144, 1),
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 40),
+              SizedBox(height: size.height * 0.04),
               const EstudianteWidget(
                 imagen: '2',
                 nombre: 'Juan Lino Gutierrez',

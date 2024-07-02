@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:kunan_v01/pantallas/register.dart';
-import 'package:kunan_v01/pantallas/seleccionar_usuario.dart';
 
 import 'Alumnos/alum_pantalla_principal.dart';
 import 'Profesores/prof_pantalla_principal.dart';
@@ -59,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
           if (responseBody['esProfesor']) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) =>  ProfMainMenuScreen(idUsuario: responseBody['id'])),
+              MaterialPageRoute(builder: (context) => const ProfMainMenuScreen()),
             );
           } else {
             Navigator.push(
@@ -87,31 +86,37 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Transform.scale(
-        scale: 1.4,
-        child: Container(
-          width: double.infinity,
-          color: const Color(0xFF21283F),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset('assets/imagenes/sombrero-de-graduacion.png'),
-              const SizedBox(height: 20),
-              const Text(
-                'KUNAN',
-                style: TextStyle(
-                  fontSize: 30,
-                  color: Color.fromRGBO(178, 219, 144, 1),
-                  fontWeight: FontWeight.bold,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: const Color(0xFF21283F),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 60),
+                Image.asset(
+                  'assets/imagenes/sombrero-de-graduacion.png',
+                  fit: BoxFit.contain,
+                  height: MediaQuery.of(context).size.height * 0.1,
                 ),
-              ),
-              SizedBox(
-                width: 250,
-                child: SingleChildScrollView(
+                const SizedBox(height: 20),
+                const Text(
+                  'KUNAN',
+                  style: TextStyle(
+                    fontSize: 30,
+                    color: Color.fromRGBO(178, 219, 144, 1),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 80),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.8,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // CORREO
                       const Text(
                         'Correo',
                         style: TextStyle(
@@ -120,12 +125,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      const SizedBox(height: 5),
                       SizedBox(
                         height: 50,
                         child: TextField(
                           controller: _emailController,
                           decoration: const InputDecoration(
-                            hintText: 'Ingresa tu correo', // Texto de sugerencia
+                            hintText: 'Ingresa tu correo',
                             hintStyle: TextStyle(
                               color: Colors.grey,
                             ),
@@ -142,8 +148,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-
-                      // CONTRASEÑA
                       const Text(
                         'Contraseña',
                         style: TextStyle(
@@ -152,12 +156,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      const SizedBox(height: 5),
                       SizedBox(
                         height: 50,
                         child: TextField(
                           controller: _passwordController,
                           decoration: InputDecoration(
-                            hintText: 'Ingresa tu contraseña', // Texto de sugerencia
+                            hintText: 'Ingresa tu contraseña',
                             hintStyle: const TextStyle(
                               color: Colors.grey,
                             ),
@@ -187,56 +192,55 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                 ),
-              ),
-              // LOGIN
-              const SizedBox(height: 50),
-              ElevatedButton(
-                onPressed: _login,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromRGBO(178, 219, 144, 1),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                ),
-                child: const Text(
-                  'Iniciar Sesión',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    '¿No tienes una cuenta? ',
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      color: Colors.white,
+                const SizedBox(height: 50),
+                ElevatedButton(
+                  onPressed: _login,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromRGBO(178, 219, 144, 1),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
                     ),
                   ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const RegisterScreen()),
-                      );
-                    },
-                    child: const Text(
-                      'Regístrate',
+                  child: const Text(
+                    'Iniciar Sesión',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      '¿No tienes una cuenta? ',
                       style: TextStyle(
                         fontSize: 16.0,
                         color: Colors.white,
-                        decoration: TextDecoration.underline,
-                        decorationColor: Colors.white,
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                        );
+                      },
+                      child: const Text(
+                        'Regístrate',
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.white,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
