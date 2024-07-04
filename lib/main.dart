@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:kunan_v01/pantallas/Alumnos/alum_asistencia.dart';
+import 'package:kunan_v01/pantallas/Alumnos/alum_calendario_semanal.dart';
+import 'package:kunan_v01/pantallas/Profesores/prof_asistencia.dart';
 import 'package:kunan_v01/pantallas/inicio.dart';
 
 import 'Controladores/save_preferences.dart';
@@ -14,7 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      //home: InicioScreen(),
+      //home: ProfTomarAsistencia(),
       home: AnimatedSplashScreen(),
     );
 

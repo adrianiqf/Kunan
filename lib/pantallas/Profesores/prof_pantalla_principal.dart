@@ -2,16 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:kunan_v01/widgets/curso_widget.dart';
-
+import 'package:http/http.dart' as http;
 import '../../widgets/custom_navigationbar.dart';
 import '../../widgets/random_lightcolor.dart';
-import 'package:http/http.dart' as http;
 
 
 class ProfMainMenuScreen extends StatefulWidget {
-
-  final String idUsuario;
-  const ProfMainMenuScreen({super.key, required this.idUsuario});
+  const ProfMainMenuScreen({super.key});
 
   @override
   State<ProfMainMenuScreen> createState() => _ProfMainMenuScreenState();
@@ -33,7 +30,7 @@ class _ProfMainMenuScreenState extends State<ProfMainMenuScreen> {
   Future<void> _fetchUserData() async {
     try {
       final response = await http.get(
-        Uri.parse('https://kunan.onrender.com/usuario_info/info/${widget.idUsuario}'),
+        Uri.parse('https://kunan.onrender.com/usuario_info/info/OuVmuk1gaojmulu9AnhQ'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -59,7 +56,7 @@ class _ProfMainMenuScreenState extends State<ProfMainMenuScreen> {
   Future<void> _fetchCoursedta() async {
     try {
       final response = await http.get(
-        Uri.parse('https://kunan.onrender.com/usuario_info/user/${widget.idUsuario}'),
+        Uri.parse('https://kunan.onrender.com/usuario_info/user/OuVmuk1gaojmulu9AnhQ'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -130,10 +127,10 @@ class _ProfMainMenuScreenState extends State<ProfMainMenuScreen> {
                     children: [
                       Container(
                         margin: const EdgeInsets.only(left: 50),
-                        child:  Column(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            const Text(
                               '¡Hola!',
                               style: TextStyle(
                                 fontSize: 50,
