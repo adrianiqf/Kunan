@@ -117,8 +117,23 @@ def update_user_info(db, id_usuario, update_data):
     
 def delete_user(db, id_usuario):
     try:
+        # Obtener todos los cursos
+        cursos_ref = db.collection('curso').stream()
+
+        # Recorrer todos los cursos para encontrar y eliminar al usuario de la colección 'matriculados'
+        for curso in cursos_ref:
+            curso_id = curso.id
+            matriculados_ref = db.collection('curso').document(curso_id).collection('matriculados')
+            existing_student_ref = matriculados_ref.where('id_usuario', '==', id_usuario).stream()
+
+            for student in existing_student_ref:
+                matriculados_ref.document(student.id).delete()
+
+        # Eliminar el documento del usuario
         usuario_ref = db.collection('usuario').document(id_usuario)
         usuario_ref.delete()
-        return {'success': True, 'message': 'Usuario eliminado exitosamente.'}
+
+        return {'success': True, 'message': 'Usuario y matriculaciones eliminados exitosamente.'}
+    
     except Exception as e:
         return {'success': False, 'message': f'Error eliminando el usuario: {e}'}
