@@ -75,3 +75,18 @@ def get_info_user(db, id_usuario):
         return {'success': True, 'message': 'Usuario obtenido exitosamente.', 'usuario': usuario}
     except Exception as e:
         return {'success': False, 'message': f'Error obteniendo el usuario: {e}'}
+    
+def get_all_users(db):
+    try:
+        usuarios_ref = db.collection('usuario')
+        usuarios_docs = usuarios_ref.stream()
+        usuarios = []
+        for doc in usuarios_docs:
+            usuario = doc.to_dict()
+            usuario['id'] = doc.id  # Incluye el ID del documento en el diccionario del usuario
+            usuarios.append(usuario)
+        if not usuarios:
+            return {'success': False, 'message': 'No hay usuarios en la base de datos.'}
+        return {'success': True, 'message': 'Usuarios obtenidos exitosamente.', 'usuarios': usuarios}
+    except Exception as e:
+        return {'success': False, 'message': f'Error obteniendo los usuarios: {e}'}
