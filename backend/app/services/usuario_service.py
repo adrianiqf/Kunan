@@ -93,11 +93,27 @@ def get_all_users(db):
     
 def update_user_info(db, id_usuario, update_data):
     try:
+        # Verificar si el nuevo código o correo ya existe en la base de datos
+        if 'codigo' in update_data or 'correo' in update_data:
+            usuario_ref = db.collection('usuario')
+            # Verificar el código
+            if 'codigo' in update_data:
+                existing_user_by_codigo = usuario_ref.where('codigo', '==', update_data['codigo']).get()
+                if existing_user_by_codigo and existing_user_by_codigo[0].id != id_usuario:
+                    return {'success': False, 'message': 'El código ya está en uso por otro usuario.'}
+            # Verificar el correo
+            if 'correo' in update_data:
+                existing_user_by_correo = usuario_ref.where('correo', '==', update_data['correo']).get()
+                if existing_user_by_correo and existing_user_by_correo[0].id != id_usuario:
+                    return {'success': False, 'message': 'El correo ya está en uso por otro usuario.'}
+        
+        # Proceder con la actualización del usuario
         usuario_ref = db.collection('usuario').document(id_usuario)
         usuario_ref.update(update_data)
         return {'success': True, 'message': 'Usuario actualizado exitosamente.'}
     except Exception as e:
         return {'success': False, 'message': f'Error actualizando el usuario: {e}'}
+
     
 def delete_user(db, id_usuario):
     try:
