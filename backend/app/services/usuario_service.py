@@ -90,3 +90,19 @@ def get_all_users(db):
         return {'success': True, 'message': 'Usuarios obtenidos exitosamente.', 'usuarios': usuarios}
     except Exception as e:
         return {'success': False, 'message': f'Error obteniendo los usuarios: {e}'}
+    
+def update_user_info(db, id_usuario, update_data):
+    try:
+        usuario_ref = db.collection('usuario').document(id_usuario)
+        usuario_ref.update(update_data)
+        return {'success': True, 'message': 'Usuario actualizado exitosamente.'}
+    except Exception as e:
+        return {'success': False, 'message': f'Error actualizando el usuario: {e}'}
+    
+def delete_user(db, id_usuario):
+    try:
+        usuario_ref = db.collection('usuario').document(id_usuario)
+        usuario_ref.delete()
+        return {'success': True, 'message': 'Usuario eliminado exitosamente.'}
+    except Exception as e:
+        return {'success': False, 'message': f'Error eliminando el usuario: {e}'}
