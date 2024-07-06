@@ -72,7 +72,10 @@ class _ProfRegistrarCursoState extends State<ProfRegistrarCurso > {
           body: jsonEncode(curso.toJson()),
         );
 
-        if (response.statusCode == 200) {
+        print(response.body);
+        print(response.statusCode);
+
+        if (response.statusCode == 201) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Curso registrado exitosamente')),
           );
