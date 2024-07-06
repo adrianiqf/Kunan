@@ -325,145 +325,83 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                 ),
               ),
               SizedBox(height: size.height * 0.03),
-               Text(
-                'Horario de Asistencia',
+
+              Text(
+                'Control de asistencia:',
                 style: TextStyle(
                   fontSize: size.width * 0.05,
                   color: const Color.fromRGBO(178, 219, 144, 1),
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              SizedBox(height: size.height * 0.031),
+
+              SizedBox(height: size.height * 0.02),
+
               Container(
                 width: size.width * 0.9,
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.white, width: 2),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(top: size.height * 0.01),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Inicio',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: size.width * 0.063,
-                              fontWeight: FontWeight.bold,
+                child: Container(
+                  margin: EdgeInsets.all(size.width * 0.021),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: _iniciarAsistencia,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color.fromRGBO(128, 179, 255, 1),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
                             ),
                           ),
-                          SizedBox(width: size.width * 0.2),
-                          Text(
-                            'Fin',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: size.width * 0.063,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: size.height * 0.01),
-                    Container(
-                      margin: EdgeInsets.only(left: size.width * 0.05),
-                      width: size.width * 0.7,
-                      child: const Divider(
-                        thickness: 1,
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(height: size.height * 0.02),
-                    Container(
-                      margin: EdgeInsets.only(top: size.height * 0.01),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '10:00',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: size.width * 0.063,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(width: size.width * 0.22),
-                          Text(
-                            '10:10',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: size.width * 0.063,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(size.width * 0.021),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: _iniciarAsistencia,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color.fromRGBO(128, 179, 255, 1),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.login, color: Colors.white),
+                              SizedBox(width: size.width * 0.011),
+                              Text(
+                                'Iniciar',
+                                style: TextStyle(
+                                  fontSize:  size.width * 0.05,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(Icons.login, color: Colors.white),
-                                  SizedBox(width: size.width * 0.011),
-                                  Text(
-                                    'Iniciar',
-                                    style: TextStyle(
-                                      fontSize:  size.width * 0.05,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: size.width * 0.01),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: _cerrarAsistencia,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color.fromRGBO(128, 179, 255, 1),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
                             ),
                           ),
-                          SizedBox(width: size.width * 0.01),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: _cerrarAsistencia,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color.fromRGBO(128, 179, 255, 1),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.logout, color: Colors.white),
+                              SizedBox(width:  size.width * 0.0011),
+                              Text(
+                                'Finalizar',
+                                style: TextStyle(
+                                  fontSize:  size.width * 0.05,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(Icons.logout, color: Colors.white),
-                                  SizedBox(width:  size.width * 0.0011),
-                                  Text(
-                                    'Cancelar',
-                                    style: TextStyle(
-                                      fontSize:  size.width * 0.05,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               SizedBox(height: size.height * 0.04),

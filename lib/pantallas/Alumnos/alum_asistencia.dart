@@ -295,85 +295,18 @@ class _AlumTomarAsistenciaState extends State<AlumTomarAsistencia> {
                 ),
               ),
               SizedBox(height: size.height * 0.03),
-              // Horario de asistencia
-              Text(
-                'Horario de Asistencia',
-                style: TextStyle(
-                  fontSize: size.width * 0.05,
-                  color: const Color.fromRGBO(178, 219, 144, 1),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              SizedBox(height: size.height * 0.03),
+
               Container(
                 width: size.width * 0.85,
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.white, width: size.width * 0.005,),
                   borderRadius: BorderRadius.circular(20),
                 ),
+
+                //Asistencia
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      margin: EdgeInsets.only(top: size.height * 0.01,),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Inicio',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: size.width * 0.062,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(width: size.width * 0.28),
-                          Text(
-                            'Fin',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: size.width * 0.062,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: size.height * 0.01),
-                    Container(
-                      margin: EdgeInsets.only(left: size.width * 0.05),
-                      width: size.width * 0.71,
-                      child: const Divider(
-                        thickness: 1,
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(height: size.height * 0.02),
-                    Container(
-                      margin: EdgeInsets.only(top: size.height * 0.01),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '10:00',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: size.width * 0.063,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(width: size.width * 0.245),
-                          Text(
-                            '10:10',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: size.width * 0.063,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
 
                     SizedBox(height: size.height * 0.02),
                     // Número de asistencia
