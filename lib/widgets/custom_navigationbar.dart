@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kunan_v01/pantallas/Alumnos/alum_calendario_semanal.dart';
+import 'package:kunan_v01/pantallas/Alumnos/alum_registar_curso.dart';
 import 'package:kunan_v01/pantallas/Profesores/prof_calendario_semanal.dart';
 import 'package:kunan_v01/pantallas/Alumnos/alum_logout.dart';
 import 'package:kunan_v01/pantallas/Profesores/prof_logout.dart';
@@ -34,6 +35,7 @@ class CustomBottomNavigationBar extends StatefulWidget {
         return {
           '/home_alumno': const EstMainMenuScreen(idUsuario: 'OuVmuk1gaojmulu9AnhQ'),
           '/calendar_alumno': const EstCalendarioSemanal(),
+          '/curse_alumno': const EstRegistrarCurso(),
           '/settings_alumno': const EstlogoutScreen(),
         };
       default:
@@ -95,6 +97,10 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today),
+            label: '',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assignment_add),
             label: '',
           ),
           BottomNavigationBarItem(

@@ -4,81 +4,57 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../widgets/custom_navigationbar.dart';
 
-class Curso {
-  String nombre;
-  String seccion;
-  String ciclo;
-  String dia;
-  String horaInicio;
-  String horaFin;
-  final String idProfesor;
-  Curso({
-    required this.nombre,
-    required this.seccion,
-    required this.ciclo,
-    required this.dia,
-    required this.horaInicio,
-    required this.horaFin,
-    required this.idProfesor,
+class Matricula {
+  final String idCurso;
+  final String idEstudiante;
+
+  Matricula({
+    required this.idCurso,
+    required this.idEstudiante,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'nombre': nombre,
-      'seccion': seccion,
-      'ciclo': ciclo,
-      'dia': dia,
-      'hora_inicio': horaInicio,
-      'hora_fin': horaFin,
-      'id_profesor': idProfesor,
+      'id_curso': idCurso,
+      'id_usuario': idEstudiante,
     };
   }
 }
 
 
 
-class ProfRegistrarCurso extends StatefulWidget {
-  const ProfRegistrarCurso ({super.key});
+class EstRegistrarCurso extends StatefulWidget {
+  const EstRegistrarCurso ({super.key});
 
   @override
-  State<ProfRegistrarCurso > createState() => _ProfRegistrarCursoState();
+  State<EstRegistrarCurso > createState() => _EstRegistrarCursoState();
 }
 
-class _ProfRegistrarCursoState extends State<ProfRegistrarCurso > {
+class _EstRegistrarCursoState extends State<EstRegistrarCurso > {
   final _formKey = GlobalKey<FormState>();
   final _nombreController = TextEditingController();
-  final _seccionController = TextEditingController();
-  final _cicloController = TextEditingController();
-  final _horaInicioController = TextEditingController();
-  final _horaFinController = TextEditingController();
-  String _selectedDia = 'Lunes';
 
   Future<void> _registrarCurso() async {
     if (_formKey.currentState!.validate()) {
-      final curso = Curso(
-        nombre: _nombreController.text,
-        seccion: _seccionController.text,
-        ciclo: _cicloController.text,
-        dia: _selectedDia,
-        horaInicio: _horaInicioController.text,
-        horaFin: _horaFinController.text,
-        idProfesor: "4CZv6v4huRSV3QUxo2R7", //Cambiar
+      final matricula = Matricula(
+        idCurso: "QmHlb0brHVJcX1Nlb4es",
+        idEstudiante: "4CZv6v4huRSV3QUxo2R7", //Cambiar
       );
 
       try {
         final response = await http.post(
-          Uri.parse('https://kunan.onrender.com/curso/create'),
+          Uri.parse('https://kunan.onrender.com/curso/register'),
           headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(curso.toJson()),
+          body: jsonEncode(matricula.toJson()),
         );
 
         if (response.statusCode == 200) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Curso registrado exitosamente')),
+            const SnackBar(content: Text('Matrícula exitosa')),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Error al registrar el curso')),
+            const SnackBar(content: Text('Error al matricularse')),
           );
         }
       } catch (e) {
@@ -91,14 +67,17 @@ class _ProfRegistrarCursoState extends State<ProfRegistrarCurso > {
 
   @override
   Widget build(BuildContext context) {
-
-    final size = MediaQuery.of(context).size;
+    final size = MediaQuery
+        .of(context)
+        .size;
 
     return Scaffold(
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        padding: EdgeInsets.only(top: size.height * 0.03, left: size.width * 0.09, right: size.width * 0.09),
+        padding: EdgeInsets.only(top: size.height * 0.03,
+            left: size.width * 0.09,
+            right: size.width * 0.09),
         color: const Color(0xFF21283F),
         child: SingleChildScrollView(
           child: Column(
@@ -118,11 +97,6 @@ class _ProfRegistrarCursoState extends State<ProfRegistrarCurso > {
                 child: Column(
                   children: [
                     _buildTextField(_nombreController, 'Nombre del Curso'),
-                    _buildTextField(_seccionController, 'Sección'),
-                    _buildTextField(_cicloController, 'Ciclo'),
-                    _buildDiaComboBox(),
-                    _buildTextField(_horaInicioController, 'Hora de Inicio'),
-                    _buildTextField(_horaFinController, 'Hora de Fin'),
                     const SizedBox(height: 50),
                     ElevatedButton(
                       onPressed: _registrarCurso,
@@ -134,7 +108,7 @@ class _ProfRegistrarCursoState extends State<ProfRegistrarCurso > {
                         ),
                       ),
                       child: const Text(
-                        'Registrar Curso',
+                        'Matricularme',
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.black,
@@ -150,14 +124,15 @@ class _ProfRegistrarCursoState extends State<ProfRegistrarCurso > {
       ),
       bottomNavigationBar: const CustomBottomNavigationBar(
         initialIndex: 2,
-        usuario: 'Profesor',
+        usuario: 'Alumno',
       ),
     );
   }
 
   Widget _buildTextField(TextEditingController controller, String label) {
-
-    final size = MediaQuery.of(context).size;
+    final size = MediaQuery
+        .of(context)
+        .size;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,7 +148,7 @@ class _ProfRegistrarCursoState extends State<ProfRegistrarCurso > {
         const SizedBox(height: 5),
         SizedBox(
           height: 50,
-          width:  size.width * 0.8,
+          width: size.width * 0.8,
           child: TextFormField(
             controller: controller,
             decoration: InputDecoration(
@@ -186,7 +161,8 @@ class _ProfRegistrarCursoState extends State<ProfRegistrarCurso > {
                   color: Colors.white,
                 ),
               ),
-              contentPadding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+              contentPadding: const EdgeInsets.symmetric(
+                  vertical: 5.0, horizontal: 10.0),
             ),
             style: const TextStyle(
               color: Colors.white,
@@ -203,57 +179,4 @@ class _ProfRegistrarCursoState extends State<ProfRegistrarCurso > {
       ],
     );
   }
-
-  Widget _buildDiaComboBox() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Día',
-          style: TextStyle(
-            fontSize: 15,
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 5),
-        SizedBox(
-          height: 50,
-          child: DropdownButtonFormField<String>(
-            dropdownColor: Colors.grey[800],
-            value: _selectedDia,
-            items: <String>['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
-                .map((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(
-                  value,
-                  style: const TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-              );
-            }).toList(),
-            onChanged: (String? newValue) {
-              setState(() {
-                _selectedDia = newValue!;
-              });
-            },
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.black,
-                ),
-              ),
-              contentPadding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-            ),
-          ),
-        ),
-        const SizedBox(height: 20),
-      ],
-    );
-  }
 }
-
-
-

@@ -206,7 +206,7 @@ class _EstlogoutScreenState extends State<EstlogoutScreen> {
         ),
       ),
       bottomNavigationBar: const CustomBottomNavigationBar(
-        initialIndex: 2,
+        initialIndex: 3,
         usuario: 'Alumno',
       ),
     );
