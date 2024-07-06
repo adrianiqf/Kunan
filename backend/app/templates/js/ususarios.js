@@ -1,10 +1,15 @@
 async function fetchUserData() {
+    const loader = document.getElementById('loader');
     try {
+        loader.style.display = 'flex';
         const response = await fetch('https://kunan.onrender.com/usuario_info/all');
         const data = await response.json();
         populateTable(data);
     } catch (error) {
         console.error('Error fetching user data:', error);
+    }finally {
+        // Ocultar el loader y mostrar la tabla
+        loader.style.display = 'none';
     }
 }
 

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumnos Matriculados</title>
+    <link rel="stylesheet" href="../css/alumnosMatriculados.css">
+</head>
+<body>
+    <div class="container-fluid h-100" style="height: 100%;overflow-y: auto;overflow-x: hidden;">
+        <button class="back-btn" onclick="goBack()">Regresar</button>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Nombres</th>
+                <th>Apellidos</th>
+                <th>Código</th>
+                <th>Facultad</th>
+                <th>Escuela</th>
+                <th>Correo</th>
+                
+            </tr>
+        </thead>
+        <tbody id="alumnos-tbody">
+            <!-- Filas de alumnos se insertarán aquí dinámicamente -->
+        </tbody>
+    </table>
+</div>
+</body>
+<script src="../js/alumnosMatriculados.js"></script>
+</html>

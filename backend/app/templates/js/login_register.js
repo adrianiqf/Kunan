@@ -34,6 +34,13 @@ document.getElementById('form_login').addEventListener('submit', function(event)
             // Manejar el éxito del inicio de sesión
             alert('Inicio de sesión exitoso');
             console.log(data);
+            if (data.esProfesor) {
+                // Redirigir a cursosProfesor.html y pasar el id como parámetro de consulta
+                window.location.href = `cursosProfesor.html?id=${data.id}`;
+            } else {
+                // Redirigir a otra página o manejar el caso cuando no es profesor
+                window.location.href = `cursosAlumnos.html?id=${data.id}`; // Cambia esto según sea necesario
+            }
             // Redirigir o realizar alguna acción adicional
         } else {
             // Manejar el error del inicio de sesión
