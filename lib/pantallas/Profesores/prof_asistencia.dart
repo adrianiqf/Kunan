@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:kunan_v01/pantallas/Profesores/prof_reporte_asistencia.dart';
@@ -26,6 +28,7 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
   String id_curso = "tkLzkJRX5ysI3P4iLMQy";
   bool _isLoading = true;
   List<Map<String, dynamic>> alumnosMatriculados = [];
+  List<Map<String, dynamic>> attendanceList = [];
 
   static const String SERVICE_UUID_CAMBIO_ESTADO =
       "2da27884-06ee-4a0d-9102-9eadb3e6629c";
@@ -244,8 +247,6 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
       print(asistentes.runtimeType);
       print(asistentes);
       await _fetchEnrolledStudents();
-
-      List<Map<String, dynamic>> attendanceList = [];
 
       for (var student in alumnosMatriculados) {
         attendanceList.add({
@@ -525,10 +526,15 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                 ),
               ),
               SizedBox(height: size.height * 0.04),
-              const EstudianteWidget(
-                imagen: '2',
-                nombre: 'Juan Lino Gutierrez',
-                estado: 'Ausente',
+              Column(
+                children: attendanceList.map((student) {
+                  var randomImage = Random().nextInt(2) + 1;
+                  return EstudianteWidget(
+                    imagen: randomImage.toString(),
+                    nombre: '${student['nombre']}',
+                    estado: student['asistencia'] ? 'Presente' : 'Ausente',
+                  );
+                }).toList(),
               ),
             ],
           ),
