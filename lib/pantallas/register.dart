@@ -92,7 +92,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           if (_esProfesor) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const ProfMainMenuScreen()),
+              MaterialPageRoute(builder: (context) => ProfMainMenuScreen(idUsuario: responseBody['id'])),
             );
           } else {
             Navigator.push(

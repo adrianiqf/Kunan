@@ -72,7 +72,7 @@ class SelectUserScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ProfMainMenuScreen()),
+                    MaterialPageRoute(builder: (context) => const ProfMainMenuScreen(idUsuario: 'OuVmuk1gaojmulu9AnhQ')),
                   );
                 },
                 style: ElevatedButton.styleFrom(

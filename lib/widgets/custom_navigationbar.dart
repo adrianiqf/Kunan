@@ -24,7 +24,7 @@ class CustomBottomNavigationBar extends StatefulWidget {
     switch (usuario) {
       case 'Profesor':
         return {
-          '/home_profesor': const ProfMainMenuScreen(),
+          '/home_profesor': const ProfMainMenuScreen(idUsuario: 'OuVmuk1gaojmulu9AnhQ'),
           '/calendar_profesor': const ProfCalendarioSemanal(),
           '/settings_profesor': const ProflogoutScreen(),
         };

@@ -5,6 +5,7 @@ import 'package:kunan_v01/widgets/curso_widget.dart';
 import 'package:http/http.dart' as http;
 import '../../widgets/custom_navigationbar.dart';
 import '../../widgets/random_lightcolor.dart';
+import '../../Controladores/save_preferences.dart';
 
 class EstMainMenuScreen extends StatefulWidget {
   final String idUsuario;
@@ -39,10 +40,18 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+
+
+
         setState(() {
           _nombre = data['nombres'];
           _isLoading = false;
         });
+
+        if (data['codigo'] != null) {
+          await SharedPrefUtils.saveString('codigo', data['codigo']);
+          print('Codigo saved: ${data['codigo']}');
+        }
       } else {
         throw Exception('Error al obtener datos del usuario');
       }
@@ -59,7 +68,7 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
         Uri.parse('https://kunan.onrender.com/usuario_info/user/${widget.idUsuario}'),
         headers: {'Content-Type': 'application/json'},
       );
-
+      print("----------------------------------------------------------------------------------");
       print(response.statusCode);
       print(response.body);
 

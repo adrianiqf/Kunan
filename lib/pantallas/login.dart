@@ -25,14 +25,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, ingresa el correo y la contraseña')),
+        const SnackBar(
+            content: Text('Por favor, ingresa el correo y la contraseña')),
       );
       return;
     }
 
     if (!email.endsWith('@unmsm.edu.pe')) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, ingresa un correo de la UNMSM')),
+        const SnackBar(
+            content: Text('Por favor, ingresa un correo de la UNMSM')),
       );
       return;
     }
@@ -54,16 +56,21 @@ class _LoginScreenState extends State<LoginScreen> {
         final responseBody = jsonDecode(response.body);
         print('ResponseBody');
         print(responseBody);
-        if (responseBody['acceso']=='Acceso exitoso') {
+        if (responseBody['acceso'] == 'Acceso exitoso') {
+
+
           if (responseBody['esProfesor']) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const ProfMainMenuScreen()),
+              MaterialPageRoute(
+                  builder: (context) => ProfMainMenuScreen(idUsuario: responseBody['id'])),
             );
           } else {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => EstMainMenuScreen(idUsuario: responseBody['id'])),
+              MaterialPageRoute(
+                  builder: (context) =>
+                      EstMainMenuScreen(idUsuario: responseBody['id'])),
             );
           }
         } else {
@@ -92,7 +99,8 @@ class _LoginScreenState extends State<LoginScreen> {
         color: const Color(0xFF21283F),
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 20.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 30.0, horizontal: 20.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -140,7 +148,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Colors.white,
                               ),
                             ),
-                            contentPadding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 5.0, horizontal: 10.0),
                           ),
                           style: const TextStyle(
                             color: Colors.white,
@@ -171,7 +180,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Colors.white,
                               ),
                             ),
-                            contentPadding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 5.0, horizontal: 10.0),
                             suffixIcon: GestureDetector(
                               onTap: () {
                                 setState(() {
@@ -179,7 +189,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 });
                               },
                               child: Icon(
-                                _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                                _passwordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
                               ),
                             ),
                           ),
@@ -224,7 +236,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                          MaterialPageRoute(
+                              builder: (context) => const RegisterScreen()),
                         );
                       },
                       child: const Text(

@@ -16,7 +16,7 @@ class AlumTomarAsistencia extends StatefulWidget {
 
 class _AlumTomarAsistenciaState extends State<AlumTomarAsistencia> {
   bool asistenciaMarcada = false;
-
+  String asistenciaTime = '';
   List<ScanResult> devices = [];
   BluetoothAdapterState _adapterState = BluetoothAdapterState.unknown;
   late StreamSubscription<BluetoothAdapterState> _adapterStateSubscription;
@@ -34,6 +34,28 @@ class _AlumTomarAsistenciaState extends State<AlumTomarAsistencia> {
   void initState() {
     super.initState();
     _initBluetooth();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    String? codigo = await SharedPrefUtils.getString('codigo');
+    setState(() {
+      asistenciaCodigo = codigo ?? "";
+    });
+    // Add any other initialization logic here
+  }
+
+  String getServiceName(BluetoothService service) {
+    switch (service.uuid.toString()) {
+      case '68cce3a1-a94d-4b2f-ac00-747066e80f05':
+        return 'Servicio de registro de asistencia';
+      case '2da27884-06ee-4a0d-9102-9eadb3e6629c':
+        return 'Servicio de inicio de asistencia';
+      case 'c4997186-5979-40ae-81ec-013a0a4313e2':
+        return 'Servicio de lectura de asistencia';
+      default:
+        return 'Servicio predefinido: ${service.uuid.toString().toUpperCase()}';
+    }
   }
 
   void _initBluetooth() async {
@@ -44,15 +66,15 @@ class _AlumTomarAsistenciaState extends State<AlumTomarAsistencia> {
 
     _adapterStateSubscription =
         FlutterBluePlus.adapterState.listen((BluetoothAdapterState state) {
-          setState(() {
-            _adapterState = state;
-          });
-          if (state == BluetoothAdapterState.on) {
-            _startScan();
-          } else {
-            _showBluetoothOffDialog();
-          }
-        });
+      setState(() {
+        _adapterState = state;
+      });
+      if (state == BluetoothAdapterState.on) {
+        _startScan();
+      } else {
+        _showBluetoothOffDialog();
+      }
+    });
 
     if (Platform.isAndroid) {
       try {
@@ -69,8 +91,8 @@ class _AlumTomarAsistenciaState extends State<AlumTomarAsistencia> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Bluetooth desactivado'),
-          content:
-          const Text('Por favor, active el Bluetooth para usar esta función.'),
+          content: const Text(
+              'Por favor, active el Bluetooth para usar esta función.'),
           actions: <Widget>[
             TextButton(
               child: const Text('OK'),
@@ -157,23 +179,42 @@ class _AlumTomarAsistenciaState extends State<AlumTomarAsistencia> {
         return;
       }
 
-      await targetCharacteristic.write(utf8.encode('start'));
-      print('Se envió "start" a la característica');
       await targetCharacteristic.write(utf8.encode(asistenciaCodigo));
       print('Se envió el código de asistencia a la característica');
+      // Capture the current time
+      DateTime now = DateTime.now();
+      String formattedTime =
+          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+
+      // Update the state
+      setState(() {
+        asistenciaMarcada = true;
+        asistenciaTime = formattedTime;
+      });
+      /* // Disconnect from the BLE server
+      await selectedDevice!.disconnect();
+      print('Desconectado del servidor BLE');
+
+      // Optionally, you can set selectedDevice to null after disconnecting
+      setState(() {
+        selectedDevice = null;
+      });*/
     } catch (e) {
-      print('Error al iniciar asistencia: $e');
+      print('Error al registrar asistencia: $e');
     }
   }
+
   @override
   Widget build(BuildContext context) {
-
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
       body: Container(
         color: const Color.fromRGBO(1, 6, 24, 1),
-        padding: EdgeInsets.only(top: size.height * 0.03, left: size.width * 0.09, right: size.width * 0.09),
+        padding: EdgeInsets.only(
+            top: size.height * 0.03,
+            left: size.width * 0.09,
+            right: size.width * 0.09),
         width: double.infinity,
         height: double.infinity,
         child: SingleChildScrollView(
@@ -185,7 +226,9 @@ class _AlumTomarAsistenciaState extends State<AlumTomarAsistencia> {
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const EstMainMenuScreen(idUsuario: 'OuVmuk1gaojmulu9AnhQ')),
+                    MaterialPageRoute(
+                        builder: (context) => const EstMainMenuScreen(
+                            idUsuario: 'OuVmuk1gaojmulu9AnhQ')),
                   );
                 },
                 child: Row(
@@ -266,11 +309,30 @@ class _AlumTomarAsistenciaState extends State<AlumTomarAsistencia> {
                 child: SingleChildScrollView(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      services.isEmpty
-                          ? 'No hay servicios disponibles'
-                          : services.map((s) => s.uuid.toString()).join('\n'),
-                      style: const TextStyle(color: Colors.white),
+                    child: services.isEmpty
+                        ? const Text(
+                      'No hay servicios disponibles',
+                      style: TextStyle(color: Colors.white),
+                    )
+                        : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: services.map((service) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          child: Row(
+                            children: [
+                              Icon(Icons.circle, size: 10, color: Colors.green),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  getServiceName(service),
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
                     ),
                   ),
                 ),
@@ -299,7 +361,10 @@ class _AlumTomarAsistenciaState extends State<AlumTomarAsistencia> {
               Container(
                 width: size.width * 0.85,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white, width: size.width * 0.005,),
+                  border: Border.all(
+                    color: Colors.white,
+                    width: size.width * 0.005,
+                  ),
                   borderRadius: BorderRadius.circular(20),
                 ),
 
@@ -307,13 +372,12 @@ class _AlumTomarAsistenciaState extends State<AlumTomarAsistencia> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
                     SizedBox(height: size.height * 0.02),
                     // Número de asistencia
                     Container(
                       margin: EdgeInsets.only(left: size.width * 0.05),
                       child: const Text(
-                        'Número de Asistencia',
+                        'Código de Alumno',
                         style: TextStyle(
                           fontSize: 25,
                           color: Color.fromRGBO(178, 219, 144, 1),
@@ -324,31 +388,15 @@ class _AlumTomarAsistenciaState extends State<AlumTomarAsistencia> {
                     SizedBox(height: size.height * 0.02),
                     Container(
                       margin: EdgeInsets.only(left: size.width * 0.05),
-                      width: size.width * 0.54,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white, width: 2),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: TextField(
-                        maxLength: 8,
-                        style: const TextStyle(color: Colors.white),
-                        onChanged: (value) {
-                          setState(() {
-                            asistenciaCodigo = value;
-                          });
-                        },
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          counterText: "",
-                          contentPadding: EdgeInsets.all(10),
-                          hintText: 'Ingresar codigo estudiante',
-                          hintStyle: TextStyle(color: Colors.white54),
+                      child: Text(
+                        asistenciaCodigo,
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
                         ),
-                        keyboardType: TextInputType.number,
                       ),
                     ),
-                    SizedBox(height: size.height * 0.02),
-
                     Container(
                       margin: EdgeInsets.all(size.width * 0.022),
                       child: Row(
@@ -359,11 +407,13 @@ class _AlumTomarAsistenciaState extends State<AlumTomarAsistencia> {
                                 await _registrarAsistencia();
                                 setState(() {
                                   asistenciaMarcada = true;
-                                  SharedPrefUtils.saveBool("asistenciaMarcada", asistenciaMarcada);
+                                  SharedPrefUtils.saveBool(
+                                      "asistenciaMarcada", asistenciaMarcada);
                                 });
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color.fromRGBO(128, 179, 255, 1),
+                                backgroundColor:
+                                    const Color.fromRGBO(128, 179, 255, 1),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5),
                                 ),
@@ -402,7 +452,7 @@ class _AlumTomarAsistenciaState extends State<AlumTomarAsistencia> {
                   child: Column(
                     children: [
                       Text(
-                        'Asistencia registrada correctamente a las 10:05',
+                        'Asistencia registrada correctamente a las $asistenciaTime',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: size.width * 0.065,

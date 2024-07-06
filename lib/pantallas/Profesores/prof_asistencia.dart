@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:kunan_v01/pantallas/Profesores/prof_reporte_asistencia.dart';
 import 'package:kunan_v01/widgets/estudiantes_widget.dart';
-
+import 'package:http/http.dart' as http;
 import '../../widgets/custom_navigationbar.dart';
 
 class ProfTomarAsistencia extends StatefulWidget {
@@ -23,6 +23,9 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
   BluetoothDevice? selectedDevice;
   List<BluetoothService> services = [];
   bool isConnecting = false;
+  String id_curso = "tkLzkJRX5ysI3P4iLMQy";
+  bool _isLoading = true;
+  List<Map<String, dynamic>> alumnosMatriculados = [];
 
   static const String SERVICE_UUID_CAMBIO_ESTADO =
       "2da27884-06ee-4a0d-9102-9eadb3e6629c";
@@ -210,7 +213,7 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
       BluetoothService? leerService;
       for (var service in services) {
         print(service);
-        if (service.uuid.toString() == "c4997186-5979-40ae-81ec-013a0a4313e2") {
+        if (service.uuid.toString() == SERVICE_UUID_LEER) {
           leerService = service;
           break;
         }
@@ -224,7 +227,7 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
       BluetoothCharacteristic? leerCharacteristic;
       for (var characteristic in leerService.characteristics) {
         if (characteristic.uuid.toString() ==
-            "33333333-3333-3333-3333-333333333334") {
+            CHARACTERISTIC_UUID_LEER) {
           leerCharacteristic = characteristic;
           break;
         }
@@ -240,10 +243,49 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
       print('Lista de asistentes:');
       print(asistentes.runtimeType);
       print(asistentes);
+      await _fetchEnrolledStudents();
 
+      List<Map<String, dynamic>> attendanceList = [];
+
+      for (var student in alumnosMatriculados) {
+        attendanceList.add({
+          'nombre': '${student['nombres']} ${student['apellidos']}',
+          'codigo': student['codigo'],
+          'asistencia': asistentes.contains(student['codigo'])
+        });
+      }
+
+      print('Lista de asistencia:');
+      print(attendanceList);
       // logica para crear la lista de asistentes
     } catch (e) {
       print('Error al cerrar asistencia: $e');
+    }
+  }
+
+  Future<void> _fetchEnrolledStudents() async {
+    try {
+      final response = await http.post(
+        Uri.parse('https://kunan.onrender.com/curso/alumnosMatriculados'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          "id_curso": "tkLzkJRX5ysI3P4iLMQy"
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        alumnosMatriculados = List<Map<String, dynamic>>.from(data['alumnos_matriculados']);
+      } else {
+        throw Exception('Error al obtener datos de alumnos matriculados');
+      }
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al obtener datos de alumnos matriculados')),
+      );
     }
   }
 
