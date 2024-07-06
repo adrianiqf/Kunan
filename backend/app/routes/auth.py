@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, redirect, request, jsonify, current_app
 from app.models.Usuario import Usuario
 from app.services.auth_service import create_user, authenticate_user
 
@@ -45,3 +45,7 @@ def login():
         return jsonify({"id": user['id'], "esProfesor": user['esprofesor'], "acceso": "Acceso exitoso"}), 200
     else:
         return jsonify({"error": user['message']}), 401
+
+@auth_bp.route('/admin')
+def admin():
+    return redirect("https://pillpop.000webhostapp.com/templates/html/menu.html")
