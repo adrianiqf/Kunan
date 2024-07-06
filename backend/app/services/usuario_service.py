@@ -46,6 +46,7 @@ def filter_cursos_profesor(db, id_usuario):
                 'hora_fin': curso_dict['hora_fin'],
                 'dia': curso_dict['dia'],
                 'duracion': curso_dict['duracion'],
+                'seccion':curso_dict['seccion'],
             })
     return cursos_profesor
 
