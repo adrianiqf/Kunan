@@ -206,7 +206,7 @@ class _ProflogoutScreenState extends State<ProflogoutScreen> {
         ),
       ),
       bottomNavigationBar: const CustomBottomNavigationBar(
-        initialIndex: 2,
+        initialIndex: 3,
         usuario: 'Profesor',
       ),
     );
