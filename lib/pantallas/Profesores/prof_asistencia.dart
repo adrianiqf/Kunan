@@ -28,7 +28,7 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
   String id_curso = "tkLzkJRX5ysI3P4iLMQy";
   bool _isLoading = true;
   List<Map<String, dynamic>> alumnosMatriculados = [];
-  List<Map<String, dynamic>> attendanceList = [];
+  List<Map<String, dynamic>> attendanceList_w = [];
 
   static const String SERVICE_UUID_CAMBIO_ESTADO =
       "2da27884-06ee-4a0d-9102-9eadb3e6629c";
@@ -43,6 +43,18 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
   void initState() {
     super.initState();
     _initBluetooth();
+  }
+  String getServiceName(BluetoothService service) {
+    switch (service.uuid.toString()) {
+      case '68cce3a1-a94d-4b2f-ac00-747066e80f05':
+        return 'Servicio de registro de asistencia';
+      case '2da27884-06ee-4a0d-9102-9eadb3e6629c':
+        return 'Servicio de inicio de asistencia';
+      case 'c4997186-5979-40ae-81ec-013a0a4313e2':
+        return 'Servicio de lectura de asistencia';
+      default:
+        return 'Servicio predefinido: ${service.uuid.toString().toUpperCase()}';
+    }
   }
 
   void _initBluetooth() async {
@@ -247,7 +259,7 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
       print(asistentes.runtimeType);
       print(asistentes);
       await _fetchEnrolledStudents();
-
+      List<Map<String, dynamic>> attendanceList = [];
       for (var student in alumnosMatriculados) {
         attendanceList.add({
           'nombre': '${student['nombres']} ${student['apellidos']}',
@@ -255,7 +267,9 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
           'asistencia': asistentes.contains(student['codigo'])
         });
       }
-
+      setState(() {
+        attendanceList_w = attendanceList ;
+      });
       print('Lista de asistencia:');
       print(attendanceList);
       // logica para crear la lista de asistentes
@@ -351,6 +365,80 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                 ),
               ),
               SizedBox(height: size.height * 0.03),
+              DropdownButton<BluetoothDevice>(
+                value: selectedDevice,
+                hint: const Text('Seleccionar dispositivo',
+                    style: TextStyle(color: Colors.white)),
+                dropdownColor: const Color.fromRGBO(1, 6, 24, 1),
+                items: devices.map((result) {
+                  return DropdownMenuItem(
+                    value: result.device,
+                    child: Text(
+                      result.device.platformName ?? 'Dispositivo desconocido',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  );
+                }).toList(),
+                onChanged: (BluetoothDevice? value) {
+                  setState(() {
+                    selectedDevice = value;
+                  });
+                },
+              ),
+              SizedBox(height: size.height * 0.02),
+              ElevatedButton(
+                onPressed: isConnecting ? null : _connectToDevice,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromRGBO(128, 179, 255, 1),
+                  foregroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text(
+                    isConnecting ? 'Conectando...' : 'Conectar al dispositivo'),
+              ),
+              SizedBox(height: size.height * 0.02),
+              Container(
+                margin: EdgeInsets.only(left: size.width * 0.01),
+                width: size.width * 0.8,
+                height: size.height * 0.2,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.white),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: services.isEmpty
+                        ? const Text(
+                      'No hay servicios disponibles',
+                      style: TextStyle(color: Colors.white),
+                    )
+                        : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: services.map((service) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          child: Row(
+                            children: [
+                              Icon(Icons.circle, size: 10, color: Colors.green),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  getServiceName(service),
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: size.height * 0.02),
               Text(
                 'Clase:',
                 style: TextStyle(
@@ -465,58 +553,6 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                 ),
               ),
               SizedBox(height: size.height * 0.03),
-              DropdownButton<BluetoothDevice>(
-                value: selectedDevice,
-                hint: const Text('Seleccionar dispositivo',
-                    style: TextStyle(color: Colors.white)),
-                dropdownColor: const Color.fromRGBO(1, 6, 24, 1),
-                items: devices.map((result) {
-                  return DropdownMenuItem(
-                    value: result.device,
-                    child: Text(
-                      result.device.platformName ?? 'Dispositivo desconocido',
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  );
-                }).toList(),
-                onChanged: (BluetoothDevice? value) {
-                  setState(() {
-                    selectedDevice = value;
-                  });
-                },
-              ),
-              SizedBox(height: size.height * 0.02),
-              ElevatedButton(
-                onPressed: isConnecting ? null : _connectToDevice,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromRGBO(128, 179, 255, 1),
-                  foregroundColor: Colors.black,
-                ),
-                child: Text(
-                    isConnecting ? 'Conectando...' : 'Conectar al dispositivo'),
-              ),
-              SizedBox(height: size.height * 0.02),
-              Container(
-                margin: EdgeInsets.only(left: size.width * 0.01),
-                width: size.width * 0.8,
-                height: size.height * 0.2,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      services.isEmpty
-                          ? 'No hay servicios disponibles'
-                          : services.map((s) => s.uuid.toString()).join('\n'),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: size.height * 0.03),
               Text(
                 'Estudiantes inasistentes:',
                 style: TextStyle(
@@ -527,7 +563,7 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
               ),
               SizedBox(height: size.height * 0.04),
               Column(
-                children: attendanceList.map((student) {
+                children: attendanceList_w.map((student) {
                   var randomImage = Random().nextInt(2) + 1;
                   return EstudianteWidget(
                     imagen: randomImage.toString(),
