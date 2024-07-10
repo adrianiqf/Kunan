@@ -28,7 +28,20 @@ class _ProfMainMenuScreenState extends State<ProfMainMenuScreen> {
     _fetchUserData();
     _fetchCoursedta();
   }
-
+  Future<void> _saveUserData(Map<String, dynamic> userData) async {
+    try {
+      await SharedPrefUtils.saveString('apellidos', userData['apellidos'] ?? '');
+      await SharedPrefUtils.saveString('codigo', userData['codigo'] ?? '');
+      await SharedPrefUtils.saveString('correo', userData['correo'] ?? '');
+      await SharedPrefUtils.saveBool('esProfesor', userData['esProfesor'] ?? false);
+      await SharedPrefUtils.saveString('escuela', userData['escuela'] ?? '');
+      await SharedPrefUtils.saveString('facultad', userData['facultad'] ?? '');
+      await SharedPrefUtils.saveString('nombres', userData['nombres'] ?? '');
+      print('Datos de usuario guardados exitosamente');
+    } catch (e) {
+      print('Error al guardar datos de usuario: $e');
+    }
+  }
   Future<void> _fetchUserData() async {
     try {
       final response = await http.get(
@@ -46,8 +59,7 @@ class _ProfMainMenuScreenState extends State<ProfMainMenuScreen> {
           _isLoading = false;
         });
         if (data['codigo'] != null) {
-          await SharedPrefUtils.saveString('codigo', data['codigo']);
-          print('Codigo saved: ${data['codigo']}');
+          _saveUserData(data);
         }
 
       } else {

@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kunan_v01/pantallas/Alumnos/alum_asistencia.dart';
-import 'package:kunan_v01/pantallas/Alumnos/alum_calendario_semanal.dart';
-import 'package:kunan_v01/pantallas/Profesores/prof_asistencia.dart';
 import 'package:kunan_v01/pantallas/inicio.dart';
 
 import 'Controladores/save_preferences.dart';
@@ -17,7 +14,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      //home: ProfTomarAsistencia(),
       home: AnimatedSplashScreen(),
     );
 
@@ -49,12 +45,16 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen> with Single
       end: 1,
     ).animate(_controller);
     _controller.forward();
-
-    _clearSharedPreferences();
+    _printPreferences();
+   // _clearSharedPreferences();
   }
 
   void _clearSharedPreferences() async {
     await SharedPrefUtils.clearData();
+  }
+
+  void _printPreferences() async {
+    await SharedPrefUtils.printAllValues();
   }
 
   @override

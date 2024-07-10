@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../widgets/custom_navigationbar.dart';
+import '../../Controladores/save_preferences.dart';
 
 class Matricula {
   final String idCurso;
@@ -79,10 +80,18 @@ class _EstRegistrarCursoState extends State<EstRegistrarCurso> {
   }
 
   Future<void> _registrarCurso() async {
+    String? userId = await SharedPrefUtils.getString('userId');
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error: No se encontró el ID del usuario')),
+      );
+      return;
+    }
+
     if (_formKey.currentState!.validate()) {
       final matricula = Matricula(
         idCurso: _idController.text,
-        idEstudiante: "4CZv6v4huRSV3QUxo2R7", //Cambiar
+        idEstudiante: userId, //Cambiar
       );
 
       try {

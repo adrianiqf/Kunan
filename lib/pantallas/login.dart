@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:kunan_v01/pantallas/register.dart';
-
+import 'package:kunan_v01/Controladores/save_preferences.dart';
 import 'Alumnos/alum_pantalla_principal.dart';
 import 'Profesores/prof_pantalla_principal.dart';
 
@@ -18,6 +18,54 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _passwordVisible = false;
+  bool _hasOfflineData = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkOfflineData();
+    print(_hasOfflineData);
+  }
+
+  Future<void> _checkOfflineData() async {
+    final isLoggedIn = await SharedPrefUtils.getBool("isLoggedIn");
+    final esProfesor = await SharedPrefUtils.getBool("esProfesor");
+    final idUsuario = await SharedPrefUtils.getString("userId");
+
+    if (isLoggedIn == true && idUsuario != null) {
+      setState(() {
+        _hasOfflineData = true;
+      });
+    } else {
+      setState(() {
+        _hasOfflineData = false;
+      });
+    }
+  }
+
+  Future<void> _checkOfflineLogin() async {
+    final isLoggedIn = await SharedPrefUtils.getBool("isLoggedIn");
+    final esProfesor = await SharedPrefUtils.getBool("esProfesor");
+    final idUsuario = await SharedPrefUtils.getString("userId");
+
+    if (isLoggedIn == true && idUsuario != null) {
+      if (esProfesor == true) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProfMainMenuScreen(idUsuario: idUsuario),
+          ),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => EstMainMenuScreen(idUsuario: idUsuario),
+          ),
+        );
+      }
+    }
+  }
 
   Future<void> _login() async {
     String email = _emailController.text;
@@ -57,13 +105,17 @@ class _LoginScreenState extends State<LoginScreen> {
         print('ResponseBody');
         print(responseBody);
         if (responseBody['acceso'] == 'Acceso exitoso') {
-
-
+          await SharedPrefUtils.saveString(
+              'userId', responseBody['id'].toString());
+          await SharedPrefUtils.saveBool(
+              'esProfesor', responseBody['esProfesor']);
+          await SharedPrefUtils.saveBool('isLoggedIn', true);
           if (responseBody['esProfesor']) {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => ProfMainMenuScreen(idUsuario: responseBody['id'])),
+                  builder: (context) =>
+                      ProfMainMenuScreen(idUsuario: responseBody['id'])),
             );
           } else {
             Navigator.push(
@@ -218,6 +270,25 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.black,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _hasOfflineData ? _checkOfflineLogin : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _hasOfflineData
+                        ?  const Color.fromRGBO(178, 219, 144, 1)
+                        :  const Color(0xFF9FA2B2),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                  child: Text(
+                    'Conexión Offline',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: _hasOfflineData ? Colors.black : Colors.white,
                     ),
                   ),
                 ),
