@@ -3,7 +3,7 @@ from app.models.Usuario import Usuario
 from app.models.Curso import Curso
 from datetime import datetime, date
 
-from app.services.curso_service import create_course_service, register_student_service,get_matriculados_por_curso,unregister_student_service,get_course_info_service,edit_course_service,delete_course_service
+from app.services.curso_service import create_course_service, register_student_service,get_matriculados_por_curso,unregister_student_service,get_course_info_service,edit_course_service,delete_course_service, registrar_asistencia
 
 curso_bp = Blueprint('curso', __name__)
 
@@ -140,3 +140,17 @@ def delete_course():
         return jsonify({"message": "Curso eliminado exitosamente"}), 200
     else:
         return jsonify({"message": result['message']}), 400
+
+@curso_bp.route('/registrar_asistencia', methods=['POST'])
+def endpoint_registrar_asistencia():
+    data = request.json
+    db = current_app.config['db']
+    id_asistencia = data.get('id_asistencia')
+    id_curso = data.get('id_curso')
+    alumnos_estado = data.get('alumnos_estado')
+
+    resultado = registrar_asistencia(db,id_asistencia, id_curso, alumnos_estado)
+    if resultado['success']:
+        return jsonify({"success": True, "message": "Asistencia registrada correctamente"}), 200
+    else:
+        return jsonify({"success": False, "message": resultado['message']}), 400

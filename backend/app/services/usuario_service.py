@@ -139,3 +139,5 @@ def delete_user(db, id_usuario):
     
     except Exception as e:
         return {'success': False, 'message': f'Error eliminando el usuario: {e}'}
+
+

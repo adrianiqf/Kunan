@@ -205,3 +205,22 @@ def delete_course_service(db, id_curso):
 
     except Exception as e:
         return {'success': False, 'message': f'Error eliminando el curso: {e}'}
+    
+def registrar_asistencia(db, id_asistencia, id_curso, alumnos_estado):
+    try:
+        asistencia_ref = db.collection('asistencia').document(id_asistencia)
+        # Verificar si el documento de asistencia existe
+        if not asistencia_ref.get().exists:
+            return {'success': False, 'message': 'Asistencia no encontrada'}
+
+        for alumno in alumnos_estado:
+            # Crear o actualizar el documento por cada alumno en la subcolección 'lista'
+            # Asegurándose de incluir tanto el id_usuario como el estado
+            asistencia_ref.collection('lista').document(alumno['id_usuario']).set({
+                'id_usuario': alumno['id_usuario'],  # Asegurarse de incluir el id_usuario
+                'estado': alumno['estado']
+            })
+
+        return {'success': True, 'message': 'Asistencia registrada correctamente'}
+    except Exception as e:
+        return {'success': False, 'message': f'Error al registrar asistencia: {e}'}
