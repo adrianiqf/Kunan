@@ -4,27 +4,33 @@ import 'package:kunan_v01/widgets/calend_widget.dart';
 import '../../widgets/custom_navigationbar.dart';
 
 
-class EstCalendarioDiario extends StatelessWidget {
-  const EstCalendarioDiario({super.key});
+class EstCalendarioSemanal extends StatelessWidget {
+  const EstCalendarioSemanal({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
 
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         color: const Color.fromRGBO(1,6,24,1),
 
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+
             const SizedBox(height: 20),
-            const Text(
-              '22 de abril del 2024',
-              style: TextStyle(
-                fontSize: 40,
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
+            Container(
+              margin: const EdgeInsets.only(right: 60),
+              child: const Text(
+                'Horario',
+                style: TextStyle(
+                  fontSize: 40,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
 
@@ -134,7 +140,9 @@ class EstCalendarioDiario extends StatelessWidget {
 
           ],
         ),
+
       ),
+
       bottomNavigationBar: const CustomBottomNavigationBar(
         initialIndex: 1,
         usuario: 'Alumno',

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:kunan_v01/widgets/curso_widget.dart';
 import 'package:http/http.dart' as http;
+import '../../Controladores/Curso.dart';
 import '../../widgets/custom_navigationbar.dart';
 import '../../widgets/random_lightcolor.dart';
 import '../../Controladores/save_preferences.dart';
@@ -16,9 +17,13 @@ class EstMainMenuScreen extends StatefulWidget {
 }
 
 class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
+
+  late String idUsuario;
   String _nombre = "";
-  List<dynamic> _cursos = [];
+  List<dynamic> __cursos = [];
+  List<Curso> _cursos = [];
   bool _isLoading = true;
+  Curso? _cursoEnCurso;
 
   @override
   void initState() {
@@ -31,15 +36,19 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
     await SharedPrefUtils.printAllValues();
   }
   Future<void> _loadData() async {
+    idUsuario = (await SharedPrefUtils.getString("userId"))!;
+    /*
     final cursos = await SharedPrefUtils.getStringList('user_courses');
     if (cursos != null && cursos.isNotEmpty) {
       setState(() {
-        _cursos = cursos;
+        __cursos = cursos;
         _isLoading = false;
       });
     } else {
-      await _fetchCoursedta();
+      //await _fetchCoursedta();
     }
+*/
+    _fetchCoursedta();
 
     final nombre = await SharedPrefUtils.getString('nombres');
     if (nombre != null) {
@@ -49,6 +58,9 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
     } else {
       await _fetchUserData();
     }
+
+
+
   }
   Future<void> _saveUserData(Map<String, dynamic> userData) async {
     try {
@@ -73,7 +85,7 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
     try {
       final response = await http.get(
         Uri.parse(
-            'https://kunan.onrender.com/usuario_info/info/${widget.idUsuario}'),
+            'https://kunan.onrender.com/usuario_info/info/$idUsuario'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -104,7 +116,7 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
     try {
       final response = await http.get(
         Uri.parse(
-            'https://kunan.onrender.com/usuario_info/user/${widget.idUsuario}'),
+            'https://kunan.onrender.com/usuario_info/user/$idUsuario'),
         headers: {'Content-Type': 'application/json'},
       );
       print(
@@ -118,9 +130,10 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
         final courseNames =
             courses.map((course) => course['nombre'].toString()).toList();
         setState(() {
-          _cursos = courseNames;
+          //_cursos = courseNames;
+          _cursos = parseCursos(response.body);
+          _cursoEnCurso = _getCursoEnCurso(_cursos);
           _isLoading = false;
-          print(_cursos);
         });
         // Guardar cursos en SharedPreferences
         await SharedPrefUtils.saveStringList('user_courses', courseNames);
@@ -132,6 +145,15 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
         const SnackBar(content: Text('Error al obtener datos del servidor')),
       );
     }
+  }
+
+  Curso? _getCursoEnCurso(List<Curso> cursos) {
+    for (var curso in cursos) {
+      if (isCursoEnProgreso(curso)) {
+        return curso;
+      }
+    }
+    return null;
   }
 
   @override
@@ -214,8 +236,9 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
 
                   // EN CURSO
                   Container(
-                    margin: EdgeInsets.only(
-                        left: size.width * 0.06, right: size.width * 0.06),
+                    margin: EdgeInsets.only(left: size.width * 0.07, right: size.width * 0.06),
+                    alignment: Alignment.centerLeft,
+
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -226,16 +249,28 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
                             color: const Color.fromRGBO(178, 219, 144, 1),
                           ),
                         ),
-                        const CursoWidget(
-                          curso: 'Taller de Software Movil',
-                          siglas: 'TM',
-                          color: Color.fromRGBO(255, 194, 120, 1),
-                          estado: 'Asistencia',
-                          usuario: 'Alumno',
-                        ),
+                        if (_isLoading)
+                          const Center(child: CircularProgressIndicator())
+                        else if (_cursoEnCurso != null)
+                          CursoWidget(
+                            curso: _cursoEnCurso!.nombre,
+                            siglas: _cursoEnCurso!.nombre.substring(0, 2).toUpperCase(),
+                            color: getRandomLightColor(),
+                            estado: 'Asistencia',
+                            usuario: 'Alumno',
+                          )
+                        else
+                          const Text(
+                            'No se está realizando ningún curso',
+                            style: TextStyle(
+                              fontSize: 22,
+                              color: Colors.white,
+                            ),
+                          ),
                       ],
                     ),
                   ),
+
 
                   SizedBox(height: size.height * 0.03),
 
@@ -261,7 +296,8 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: _cursos.length,
                             itemBuilder: (context, index) {
-                              final cursoNombre = _cursos[index];
+                              final curso = _cursos[index];
+                              final cursoNombre = curso.nombre;
                               final siglas =
                                   cursoNombre.substring(0, 2).toUpperCase();
                               final Color color = getRandomLightColor();

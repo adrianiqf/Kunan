@@ -1,29 +1,89 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:kunan_v01/widgets/calend_widget.dart';
 
+import '../../Controladores/Curso.dart';
+import '../../Controladores/save_preferences.dart';
 import '../../widgets/custom_navigationbar.dart';
+import 'package:http/http.dart' as http;
 
-
-class EstCalendarioSemanal extends StatelessWidget {
+class EstCalendarioSemanal extends StatefulWidget {
   const EstCalendarioSemanal({super.key});
 
   @override
+  State<EstCalendarioSemanal> createState() => _EstCalendarioSemanalState();
+}
+
+class _EstCalendarioSemanalState extends State<EstCalendarioSemanal> {
+
+  late String idUsuario;
+  List<Curso> _cursos = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCoursedta();
+  }
+
+
+  Future<void> _fetchCoursedta() async {
+    idUsuario = (await SharedPrefUtils.getString("userId"))!;
+    try {
+      final response = await http.get(
+        Uri.parse(
+            'https://kunan.onrender.com/usuario_info/user/$idUsuario'),
+        headers: {'Content-Type': 'application/json'},
+      );
+      print(
+          "----------------------------------------------------------------------------------");
+      print(response.statusCode);
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _cursos = parseCursos(response.body);
+          _isLoading = false;
+          print(jsonEncode(_cursos));
+        });
+      } else {
+        throw Exception('Error al obtener datos del usuario');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al obtener datos del servidor')),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+
+    final sortedCursos = sortCursosByDiaYHora(_cursos);
+
+    Map<String, List<Curso>> cursosPorDia = {};
+    for (var curso in sortedCursos) {
+      if (!cursosPorDia.containsKey(curso.dia)) {
+        cursosPorDia[curso.dia] = [];
+      }
+      cursosPorDia[curso.dia]!.add(curso);
+    }
+
+    String formatHora(String hora) {
+      final horas = hora.substring(0, 2);
+      final minutos = hora.substring(2, 4);
+      return '$horas:$minutos';
+    }
+
     return Scaffold(
 
       body: Container(
-        width: double.infinity,
-        height: double.infinity,
         color: const Color.fromRGBO(1,6,24,1),
-
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-
             const SizedBox(height: 20),
             Container(
-              margin: const EdgeInsets.only(right: 60),
+              margin: const EdgeInsets.only(right: 30),
               child: const Text(
                 'Horario',
                 style: TextStyle(
@@ -36,113 +96,66 @@ class EstCalendarioSemanal extends StatelessWidget {
 
             const SizedBox(height: 30),
 
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  SizedBox(
-                    height: 800,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        calendHorasWidget('', ''),
-                        calendHorasWidget('08', 'AM'),
-                        calendHorasWidget('09', 'AM'),
-                        calendHorasWidget('10', 'AM'),
-                        calendHorasWidget('11', 'AM'),
-                        calendHorasWidget('12', 'PM'),
-                        calendHorasWidget('13', 'PM'),
-                        calendHorasWidget('14', 'PM'),
-                      ],
-                    ),
-                  ),
+            if (_isLoading)
+              const Center(child: CircularProgressIndicator())
+            else
+              Expanded(
+                child: ListView(
+                  children: cursosPorDia.keys.map((dia) {
+                    return ExpansionTile(
+                        title: Text(
+                          dia,
+                          style: const TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold,
+                            color:  Color.fromRGBO(178, 219, 144, 1),
+                          ),
+                        ),
+                      children: cursosPorDia[dia]!.map((curso) {
+                        final enProgreso = isCursoEnProgreso(curso);
+                        return ListTile(
+                          title: Text(
+                            curso.nombre,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white,
+                            ),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${formatHora(curso.horaInicio)} - ${formatHora(curso.horaFin)} \nSección: ${curso.seccion}',
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              if (enProgreso)
+                                const Text(
+                                  'En progreso',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                            ],
+                          ),
 
-                  Column(
-                    children: [
-                      calendDiasWidget('22', 'Lun','Seleccionado'),
-                      calendCursosWidget(
-                        'Taller de Software Móvil',
-                        'Lab 01',
-                        4,
-                        "Seleccionado",
-                        const Color.fromRGBO(255, 195, 116, 1),
-                      ),
-                      calendLibreWidget(2, 'Seleccionado'),
-                      calendCursosWidget(
-                        'Minería de Datos',
-                        'Saón 103',
-                        1,
-                        "Seleccionado",
-                        const Color.fromRGBO(74, 210, 201, 1),
-                      ),
-                      //calendHorasWidget('14', 'PM'),
-                    ],
-                  ),
+                            isThreeLine: true,
+                        );
+                      }).toList(),
 
-                  Column(
-                    children: [
-                      calendDiasWidget('24', 'Mar',''),
-                      calendCursosWidget(
-                        'Gestión de riesgos',
-                        'Salón 109',
-                        4,
-                        "",
-                        const Color.fromRGBO(143, 152, 255, 1),
-                      ),
-                      calendLibreWidget(3, '')
-                    ],
-                  ),
+                    );
 
-                  Column(
-                    children: [
-                      calendDiasWidget('25', 'Mie',''),
-                      calendLibreWidget(7, '')
-                    ],
-                  ),
-
-                  Column(
-                    children: [
-                      calendDiasWidget('26', 'Jue',''),
-                      calendLibreWidget(5, ''),
-                      calendCursosWidget(
-                        'Desarrollo de Tesis 1',
-                        'Salón 104',
-                        2,
-                        "Seleccionado",
-                        const Color.fromRGBO(128, 179, 255, 1),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      calendDiasWidget('27', 'Vie',''),
-                      calendCursosWidget(
-                        'Gestión de Mantenimiento',
-                        'Salón 201',
-                        4,
-                        "Seleccionado",
-                        const Color.fromRGBO(254, 153, 70, 1),
-                      ),
-                      calendLibreWidget(3, ''),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      calendDiasWidget('28', 'Sab',''),
-                      calendLibreWidget(7, '')
-                    ],
-
-                  ),
-
-                ],
+                  }).toList(),
+                ),
               ),
-            ),
-
           ],
         ),
-
       ),
-
       bottomNavigationBar: const CustomBottomNavigationBar(
         initialIndex: 1,
         usuario: 'Alumno',
