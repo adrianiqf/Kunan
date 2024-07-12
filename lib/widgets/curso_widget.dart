@@ -89,6 +89,7 @@ class _CursoWidgetState extends State<CursoWidget> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  /*
                   if (widget.estado == "Asistencia" && !asistenciaMarcada)
                     const Text(
                       "Asistencia en proceso",
@@ -98,6 +99,8 @@ class _CursoWidgetState extends State<CursoWidget> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    */
+
                 ],
               ),
             ],

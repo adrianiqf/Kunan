@@ -20,7 +20,6 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
 
   late String idUsuario;
   String _nombre = "";
-  List<dynamic> __cursos = [];
   List<Curso> _cursos = [];
   bool _isLoading = true;
   Curso? _cursoEnCurso;
@@ -37,18 +36,17 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
   }
   Future<void> _loadData() async {
     idUsuario = (await SharedPrefUtils.getString("userId"))!;
-    /*
-    final cursos = await SharedPrefUtils.getStringList('user_courses');
-    if (cursos != null && cursos.isNotEmpty) {
+
+    final cursos = await SharedPrefUtils.getCourses('user_courses');
+
+    if (cursos.isNotEmpty) {
       setState(() {
-        __cursos = cursos;
+        _cursos = cursos;
         _isLoading = false;
       });
     } else {
-      //await _fetchCoursedta();
+      await _fetchCoursedta();
     }
-*/
-    _fetchCoursedta();
 
     final nombre = await SharedPrefUtils.getString('nombres');
     if (nombre != null) {
@@ -59,9 +57,9 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
       await _fetchUserData();
     }
 
-
-
   }
+
+
   Future<void> _saveUserData(Map<String, dynamic> userData) async {
     try {
       await SharedPrefUtils.saveString('id', userData['id'] ?? '');
@@ -136,7 +134,9 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
           _isLoading = false;
         });
         // Guardar cursos en SharedPreferences
-        await SharedPrefUtils.saveStringList('user_courses', courseNames);
+        //await SharedPrefUtils.saveStringList('user_courses', courseNames);
+        await SharedPrefUtils.saveCourses('user_courses', _cursos);
+
       } else {
         throw Exception('Error al obtener datos del usuario');
       }

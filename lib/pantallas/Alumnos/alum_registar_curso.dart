@@ -127,7 +127,7 @@ class _EstRegistrarCursoState extends State<EstRegistrarCurso> {
         width: double.infinity,
         height: double.infinity,
         padding: EdgeInsets.only(
-            top: size.height * 0.03, left: size.width * 0.09, right: size.width * 0.09),
+            top: size.height * 0.04, left: size.width * 0.09, right: size.width * 0.09),
         color: const Color(0xFF21283F),
         child: SingleChildScrollView(
           child: Column(

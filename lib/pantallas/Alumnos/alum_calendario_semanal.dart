@@ -23,9 +23,23 @@ class _EstCalendarioSemanalState extends State<EstCalendarioSemanal> {
   @override
   void initState() {
     super.initState();
-    _fetchCoursedta();
+    _loadData();
   }
 
+  Future<void> _loadData() async {
+    idUsuario = (await SharedPrefUtils.getString("userId"))!;
+
+    final cursos = await SharedPrefUtils.getCourses('user_courses');
+
+    if (cursos.isNotEmpty) {
+      setState(() {
+        _cursos = cursos;
+        _isLoading = false;
+      });
+    } else {
+      await _fetchCoursedta();
+    }
+  }
 
   Future<void> _fetchCoursedta() async {
     idUsuario = (await SharedPrefUtils.getString("userId"))!;
@@ -35,16 +49,11 @@ class _EstCalendarioSemanalState extends State<EstCalendarioSemanal> {
             'https://kunan.onrender.com/usuario_info/user/$idUsuario'),
         headers: {'Content-Type': 'application/json'},
       );
-      print(
-          "----------------------------------------------------------------------------------");
-      print(response.statusCode);
-      print(response.body);
 
       if (response.statusCode == 200) {
         setState(() {
           _cursos = parseCursos(response.body);
           _isLoading = false;
-          print(jsonEncode(_cursos));
         });
       } else {
         throw Exception('Error al obtener datos del usuario');
@@ -58,7 +67,6 @@ class _EstCalendarioSemanalState extends State<EstCalendarioSemanal> {
 
   @override
   Widget build(BuildContext context) {
-
     final sortedCursos = sortCursosByDiaYHora(_cursos);
 
     Map<String, List<Curso>> cursosPorDia = {};
@@ -76,84 +84,82 @@ class _EstCalendarioSemanalState extends State<EstCalendarioSemanal> {
     }
 
     return Scaffold(
-
       body: Container(
-        color: const Color.fromRGBO(1,6,24,1),
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            Container(
-              margin: const EdgeInsets.only(right: 30),
-              child: const Text(
-                'Horario',
-                style: TextStyle(
-                  fontSize: 40,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
+        color: const Color.fromRGBO(1, 6, 24, 1),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Column(
+              children: [
+                SizedBox(height: constraints.maxHeight * 0.05),
+                Container(
+                  margin: EdgeInsets.only(right: constraints.maxWidth * 0.1),
+                  child: Text(
+                    'Horario',
+                    style: TextStyle(
+                      fontSize: constraints.maxWidth * 0.1,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            if (_isLoading)
-              const Center(child: CircularProgressIndicator())
-            else
-              Expanded(
-                child: ListView(
-                  children: cursosPorDia.keys.map((dia) {
-                    return ExpansionTile(
-                        title: Text(
-                          dia,
-                          style: const TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.bold,
-                            color:  Color.fromRGBO(178, 219, 144, 1),
-                          ),
-                        ),
-                      children: cursosPorDia[dia]!.map((curso) {
-                        final enProgreso = isCursoEnProgreso(curso);
-                        return ListTile(
+                SizedBox(height: constraints.maxHeight * 0.05),
+                if (_isLoading)
+                  const Center(child: CircularProgressIndicator())
+                else
+                  Expanded(
+                    child: ListView(
+                      children: cursosPorDia.keys.map((dia) {
+                        return ExpansionTile(
                           title: Text(
-                            curso.nombre,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
+                            dia,
+                            style: TextStyle(
+                              fontSize: constraints.maxWidth * 0.065,
+                              fontWeight: FontWeight.bold,
+                              color: const Color.fromRGBO(178, 219, 144, 1),
                             ),
                           ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${formatHora(curso.horaInicio)} - ${formatHora(curso.horaFin)} \nSección: ${curso.seccion}',
-                                style: const TextStyle(
-                                  fontSize: 22,
+                          children: cursosPorDia[dia]!.map((curso) {
+                            final enProgreso = isCursoEnProgreso(curso);
+                            return ListTile(
+                              title: Text(
+                                curso.nombre,
+                                style: TextStyle(
+                                  fontSize: constraints.maxWidth * 0.06,
+                                  fontWeight: FontWeight.w500,
                                   color: Colors.white,
                                 ),
                               ),
-                              if (enProgreso)
-                                const Text(
-                                  'En progreso',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red,
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${formatHora(curso.horaInicio)} - ${formatHora(curso.horaFin)} \nSección: ${curso.seccion}',
+                                    style: TextStyle(
+                                      fontSize: constraints.maxWidth * 0.055,
+                                      color: Colors.white,
+                                    ),
                                   ),
-                                ),
-                            ],
-                          ),
-
-                            isThreeLine: true,
+                                  if (enProgreso)
+                                    Text(
+                                      'En progreso',
+                                      style: TextStyle(
+                                        fontSize: constraints.maxWidth * 0.035,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              isThreeLine: true,
+                            );
+                          }).toList(),
                         );
                       }).toList(),
-
-                    );
-
-                  }).toList(),
-                ),
-              ),
-          ],
+                    ),
+                  ),
+              ],
+            );
+          },
         ),
       ),
       bottomNavigationBar: const CustomBottomNavigationBar(
