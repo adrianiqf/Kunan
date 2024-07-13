@@ -45,6 +45,7 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
     if (cursos.isNotEmpty) {
       setState(() {
         _cursos = cursos;
+        _cursoEnCurso = _getCursoEnCurso(_cursos);
         _isLoading = false;
       });
     } else {
@@ -239,8 +240,7 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
 
                   // EN CURSO
                   Container(
-                    margin: EdgeInsets.only(
-                        left: size.width * 0.07, right: size.width * 0.06),
+                    margin: EdgeInsets.only(left: size.width * 0.1, right: size.width * 0.06),
                     alignment: Alignment.centerLeft,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,7 +259,7 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
                             curso: _cursoEnCurso!.nombre,
                             siglas: _cursoEnCurso!.nombre.substring(0, 2).toUpperCase(),
                             color: getRandomLightColor(),
-                            estado: 'Asistencia',
+                            estado: 'En Curso',
                             usuario: 'Alumno',
                           )
                         else
@@ -273,6 +273,10 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
                       ],
                     ),
                   ),
+
+                  SizedBox(height: size.height * 0.03),
+
+                  TomarAsistenciaWidget(context:context, usuario: "Alumno"),
 
                   SizedBox(height: size.height * 0.03),
 

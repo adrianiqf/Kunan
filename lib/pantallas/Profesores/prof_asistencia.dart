@@ -7,6 +7,8 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:kunan_v01/pantallas/Profesores/prof_reporte_asistencia.dart';
 import 'package:kunan_v01/widgets/estudiantes_widget.dart';
 import 'package:http/http.dart' as http;
+import '../../Controladores/Curso.dart';
+import '../../Controladores/save_preferences.dart';
 import '../../widgets/custom_navigationbar.dart';
 import '../../Controladores/save_preferences.dart';
 import '../../Controladores/Curso.dart';
@@ -33,6 +35,10 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
   List<Map<String, dynamic>> _cursos = [];
   Map<String, dynamic>? _selectedCurso;
 
+
+  List<Curso> _cursos = [];
+  Curso? _selectedCurso;
+  late String idUsuario;
 
   static const String SERVICE_UUID_CAMBIO_ESTADO =
       "2da27884-06ee-4a0d-9102-9eadb3e6629c";
@@ -320,7 +326,7 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          "id_curso": "tkLzkJRX5ysI3P4iLMQy"
+          "id_curso": _selectedCurso?.id,
         }),
       );
 
@@ -398,6 +404,7 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                   ),
                 ),
               ),
+
               SizedBox(height: size.height * 0.03),
               Text(
                 'Seleccionar Curso:',
@@ -482,8 +489,8 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                           padding: const EdgeInsets.symmetric(vertical: 4.0),
                           child: Row(
                             children: [
-                              Icon(Icons.circle, size: 10, color: Colors.green),
-                              SizedBox(width: 8),
+                              const Icon(Icons.circle, size: 10, color: Colors.green),
+                              const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   getServiceName(service),
