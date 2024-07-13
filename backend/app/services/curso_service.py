@@ -3,6 +3,7 @@ from app.models.Curso import Curso
 from google.cloud import firestore
 from google.cloud.firestore_v1.base_query import FieldFilter
 from app.services.usuario_service import get_info_user
+from datetime import datetime
 
 def create_course_service(db,  curso):
     try:
@@ -206,21 +207,144 @@ def delete_course_service(db, id_curso):
     except Exception as e:
         return {'success': False, 'message': f'Error eliminando el curso: {e}'}
     
-def registrar_asistencia(db, id_asistencia, id_curso, alumnos_estado):
+def registrar_asistencia(db,id_curso, alumnos_estado):
     try:
-        asistencia_ref = db.collection('asistencia').document(id_asistencia)
-        # Verificar si el documento de asistencia existe
-        if not asistencia_ref.get().exists:
-            return {'success': False, 'message': 'Asistencia no encontrada'}
+
+        # Obtener el último número de clase registrado para el id_curso
+        query = db.collection('asistencia').where('id_curso', '==', id_curso)
+        query_snapshot = query.get()
+
+        # Cuenta el número de documentos en el QuerySnapshot
+        count = len(query_snapshot)
+        print('Número de documentos:', count)
+        
+        if count==0:
+            numero_clase = 1
+        else:
+            numero_clase = count+1
+
+        # Obtener la fecha y hora actual
+        fecha_hora_actual = datetime.now().isoformat()
+
+        # Crear un nuevo documento en la colección 'asistencia'
+        asistencia_ref = db.collection('asistencia').add({
+            'id_curso': id_curso,
+            'numero_clase': numero_clase,
+            'fecha': fecha_hora_actual
+        })
+
+        # Obtener el ID del nuevo documento
+        id_asistencia = asistencia_ref[1].id
+
+        asistencia_ref_id=db.collection('asistencia').document(id_asistencia)
+
+        asistencia = asistencia_ref_id.get().to_dict()
+
+        # Verificar si el usuario existe
+        if not asistencia:
+            print("Error: La asistencia no existe.")
+            return {'success': False, 'message': f'Error: La asistencia no existe'}
+            #return False
 
         for alumno in alumnos_estado:
             # Crear o actualizar el documento por cada alumno en la subcolección 'lista'
             # Asegurándose de incluir tanto el id_usuario como el estado
-            asistencia_ref.collection('lista').document(alumno['id_usuario']).set({
-                'id_usuario': alumno['id_usuario'],  # Asegurarse de incluir el id_usuario
-                'estado': alumno['estado']
+
+            asistencia_ref_id.collection('lista').add({
+                "id_usuario": alumno['id_usuario'],  # Asegurarse de incluir el id_usuario
+                "estado": alumno['estado']
             })
 
         return {'success': True, 'message': 'Asistencia registrada correctamente'}
     except Exception as e:
         return {'success': False, 'message': f'Error al registrar asistencia: {e}'}
+    
+def contar_asistencias(db, id_usuario):
+    try:
+        # Inicializar los contadores para asistencia e inasistencia
+        contador_asistencia = 0
+        contador_inasistencia = 0
+        
+        # Obtener todos los documentos de la colección 'asistencia'
+        asistencias_ref = db.collection('asistencia').stream()
+        
+        for asistencia in asistencias_ref:
+            # Obtener el documento de la colección 'lista' para cada documento de asistencia
+            lista_ref = asistencia.reference.collection('lista').where('id_usuario', '==', id_usuario).stream()
+            
+            for doc in lista_ref:
+                alumno = doc.to_dict()
+                
+                # Contar según el estado del alumno
+                if alumno['estado'] == 'Presente':
+                    contador_asistencia += 1
+                elif alumno['estado'] == 'Ausente':
+                    contador_inasistencia += 1
+
+        return {
+            'success': True,
+            'asistencias': contador_asistencia,
+            'inasistencias': contador_inasistencia
+        }
+
+    except Exception as e:
+        return {'success': False, 'message': f'Error al contar asistencias: {e}'}
+    
+def contar_asistencias(db, id_usuario):
+    try:
+        # Inicializar un diccionario para almacenar los resultados por curso
+        resultados_por_curso = {}
+
+        # Obtener todos los documentos de la colección 'asistencia'
+        asistencias_ref = db.collection('asistencia').stream()
+
+        for asistencia in asistencias_ref:
+            asistencia_data = asistencia.to_dict()
+            id_curso = asistencia_data['id_curso']
+
+            # Inicializar contadores para este curso si no existen
+            if id_curso not in resultados_por_curso:
+                 # Obtener el nombre del curso desde la colección 'curso'
+                curso_ref = db.collection('curso').document(id_curso).get()
+                if curso_ref.exists:
+                    nombre_curso = curso_ref.to_dict().get('nombre', 'Nombre no encontrado')
+                else:
+                    nombre_curso = 'Nombre no encontrado'
+                
+                resultados_por_curso[id_curso] = {
+                    'nombre_curso': nombre_curso,
+                    'asistencias': 0,
+                    'inasistencias': 0
+                }
+
+            # Obtener la colección 'lista' para cada documento de asistencia
+            lista_ref = asistencia.reference.collection('lista').where('id_usuario', '==', id_usuario).stream()
+
+            for doc in lista_ref:
+                alumno = doc.to_dict()
+
+                # Contar según el estado del alumno
+                if alumno['estado'] == 'Presente':
+                    resultados_por_curso[id_curso]['asistencias'] += 1
+                elif alumno['estado'] == 'Ausente':
+                    resultados_por_curso[id_curso]['inasistencias'] += 1
+
+        # Convertir los resultados en una lista para el retorno
+        resultados = [
+            {
+                'id_curso': id_curso,
+                'nombre_curso':data['nombre_curso'],
+                'asistencias': data['asistencias'],
+                'inasistencias': data['inasistencias']
+            } 
+            for id_curso, data in resultados_por_curso.items()
+        ]
+
+        return {
+            'success': True,
+            'resultados': resultados
+        }
+
+    except Exception as e:
+        return {'success': False, 'message': f'Error al contar asistencias: {e}'}
+
