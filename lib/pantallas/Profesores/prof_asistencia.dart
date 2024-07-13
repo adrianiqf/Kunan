@@ -8,6 +8,8 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:kunan_v01/pantallas/Profesores/prof_reporte_asistencia.dart';
 import 'package:kunan_v01/widgets/estudiantes_widget.dart';
 import 'package:http/http.dart' as http;
+import '../../Controladores/Curso.dart';
+import '../../Controladores/save_preferences.dart';
 import '../../widgets/custom_navigationbar.dart';
 
 class ProfTomarAsistencia extends StatefulWidget {
@@ -30,6 +32,10 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
   List<Map<String, dynamic>> alumnosMatriculados = [];
   List<Map<String, dynamic>> attendanceList_w = [];
 
+  List<Curso> _cursos = [];
+  Curso? _selectedCurso;
+  late String idUsuario;
+
   static const String SERVICE_UUID_CAMBIO_ESTADO =
       "2da27884-06ee-4a0d-9102-9eadb3e6629c";
   static const String CHARACTERISTIC_UUID_CAMBIO_ESTADO =
@@ -42,8 +48,59 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
   @override
   void initState() {
     super.initState();
+    _loadData();
     _initBluetooth();
   }
+
+  Future<void> _loadData() async {
+    idUsuario = (await SharedPrefUtils.getString("userId"))!;
+    final cursos = await SharedPrefUtils.getCourses('user_courses');
+
+    if (cursos.isNotEmpty) {
+      setState(() {
+        _cursos = cursos;
+        _selectedCurso = _getCursoEnCurso(_cursos);
+        _isLoading = false;
+      });
+    } else {
+      await _fetchCourseData();
+    }
+  }
+
+  Future<void> _fetchCourseData() async {
+    idUsuario = (await SharedPrefUtils.getString("userId"))!;
+    try {
+      final response = await http.get(
+        Uri.parse('https://kunan.onrender.com/usuario_info/user/$idUsuario'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _cursos = parseCursos(response.body);
+          _selectedCurso = _getCursoEnCurso(_cursos);
+          _isLoading = false;
+        });
+      } else {
+        throw Exception('Error al obtener datos del usuario');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al obtener datos del servidor')),
+      );
+    }
+  }
+
+  Curso? _getCursoEnCurso(List<Curso> cursos) {
+    for (var curso in cursos) {
+      if (isCursoEnProgreso(curso)) {
+        return curso;
+      }
+    }
+    return null;
+  }
+
+
   String getServiceName(BluetoothService service) {
     switch (service.uuid.toString()) {
       case '68cce3a1-a94d-4b2f-ac00-747066e80f05':
@@ -286,7 +343,7 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          "id_curso": "tkLzkJRX5ysI3P4iLMQy"
+          "id_curso": _selectedCurso?.id,
         }),
       );
 
@@ -364,7 +421,31 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                   ),
                 ),
               ),
+
               SizedBox(height: size.height * 0.03),
+
+              DropdownButton<Curso>(
+                value: _selectedCurso,
+                hint: const Text('Seleccionar Curso',
+                    style: TextStyle(color: Colors.white)),
+                dropdownColor: const Color.fromRGBO(1, 6, 24, 1),
+                items: _cursos.map((Curso curso) {
+                  return DropdownMenuItem<Curso>(
+                    value: curso,
+                    child: Text(
+                        curso.nombre,
+                        style: const TextStyle(color: Colors.white)
+                    ),
+                  );
+                }).toList(),
+                onChanged: (Curso? newValue) {
+                  setState(() {
+                    _selectedCurso = newValue!;
+                  });
+                },
+              ),
+              SizedBox(height: size.height * 0.03),
+
               DropdownButton<BluetoothDevice>(
                 value: selectedDevice,
                 hint: const Text('Seleccionar dispositivo',
@@ -422,8 +503,8 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                           padding: const EdgeInsets.symmetric(vertical: 4.0),
                           child: Row(
                             children: [
-                              Icon(Icons.circle, size: 10, color: Colors.green),
-                              SizedBox(width: 8),
+                              const Icon(Icons.circle, size: 10, color: Colors.green),
+                              const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   getServiceName(service),
@@ -438,23 +519,7 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                   ),
                 ),
               ),
-              SizedBox(height: size.height * 0.02),
-              Text(
-                'Clase:',
-                style: TextStyle(
-                  fontSize: size.width * 0.05,
-                  color: const Color.fromRGBO(178, 219, 144, 1),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              SizedBox(height: size.height * 0.02),
-              Text(
-                'Taller de Software Móvil',
-                style: TextStyle(
-                  fontSize: size.width * 0.055,
-                  color: Colors.white,
-                ),
-              ),
+
               SizedBox(height: size.height * 0.03),
 
               Text(

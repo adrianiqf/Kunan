@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:kunan_v01/pantallas/Profesores/prof_asistencia.dart';
 
@@ -46,9 +45,10 @@ class _CursoWidgetState extends State<CursoWidget> {
 
     final size = MediaQuery.of(context).size;
     return Container(
-        //width: double.infinity,
+      margin: EdgeInsets.only(left: size.width * 0.01),
       width: 400,
-      height: widget.estado == "En Curso" || widget.estado == "Asistencia"? 125.0 : 75.0,
+      //height: widget.estado == "En Curso" || widget.estado == "Asistencia"? 125.0 : 75.0,
+      height: 75.0,
       decoration: BoxDecoration(
         color: widget.estado == "En Curso" || widget.estado == "Asistencia" ? Colors.white :const Color.fromRGBO(33,40,63,1),
         borderRadius: BorderRadius.circular(8),
@@ -81,15 +81,19 @@ class _CursoWidgetState extends State<CursoWidget> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    widget.curso,
-                    style: TextStyle(
-                      color: widget.estado == "En Curso" ? Colors.black : widget.color,
-                      fontSize: size.width * 0.04,
-                      fontWeight: FontWeight.bold,
+                  SizedBox(
+                    width: size.width * 0.5, // Adjust the width as needed
+                    child: Text(
+                      widget.curso,
+                      style: TextStyle(
+                        color: widget.estado == "En Curso" ? Colors.black : widget.color,
+                        fontSize: size.width * 0.04,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  /*
                   if (widget.estado == "Asistencia" && !asistenciaMarcada)
                     const Text(
                       "Asistencia en proceso",
@@ -99,24 +103,14 @@ class _CursoWidgetState extends State<CursoWidget> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    */
-
                 ],
               ),
             ],
           ),
-
           const SizedBox(height: 10),
-          if(widget.estado == "En Curso" || widget.estado == "Asistencia")
-            TomarAsistenciaWidget(context:context, usuario: widget.usuario),
-
-
-
         ],
       ),
-
     );
-
   }
 }
 
