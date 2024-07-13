@@ -99,6 +99,7 @@ function populateTable(courses) {
                     <i class="bi bi-info"></i> VerMatriculados
                 </button>
             </td>
+
         `;
 
         tableBody.appendChild(row);

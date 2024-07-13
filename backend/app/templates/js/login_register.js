@@ -5,12 +5,12 @@ document.getElementById('toggleForm').addEventListener('click', function() {
         document.getElementById('title_form').textContent = 'Inicio Sesión';
         document.getElementById('Registro_form').classList.remove('active');
         document.getElementById('form_login').classList.add('active');
-        this.textContent = 'Cambiar a Registro';
+        this.textContent = 'Regístrate aquí';
     } else {
         document.getElementById('title_form').textContent = 'Registro';
         document.getElementById('form_login').classList.remove('active');
         document.getElementById('Registro_form').classList.add('active');
-        this.textContent = 'Cambiar a Inicio de Sesión';
+        this.textContent = '¿Ya tienes una cuenta? Inicia Sesión aquí';
     }
 });
 
@@ -33,14 +33,22 @@ document.getElementById('form_login').addEventListener('submit', function(event)
         if (data.id) {
             // Manejar el éxito del inicio de sesión
             alert('Inicio de sesión exitoso');
-            console.log(data);
-            if (data.esProfesor) {
-                // Redirigir a cursosProfesor.html y pasar el id como parámetro de consulta
-                window.location.href = `cursosProfesor.html?id=${data.id}`;
-            } else {
-                // Redirigir a otra página o manejar el caso cuando no es profesor
-                window.location.href = `cursosAlumnos.html?id=${data.id}`; // Cambia esto según sea necesario
+            
+
+            if(data.esAdmin && data.esAdmin == true){
+                window.location.href = `menu.html?`;
+            } else{
+                if (data.esProfesor) {
+                    // Redirigir a cursosProfesor.html y pasar el id como parámetro de consulta
+                    window.location.href = `cursosProfesor.html?id=${data.id}`;
+                } else {
+                    // Redirigir a otra página o manejar el caso cuando no es profesor
+                    window.location.href = `cursosAlumnos.html?id=${data.id}`; // Cambia esto según sea necesario
+                    console.log(response);
+                }
             }
+
+            
             // Redirigir o realizar alguna acción adicional
         } else {
             // Manejar el error del inicio de sesión
