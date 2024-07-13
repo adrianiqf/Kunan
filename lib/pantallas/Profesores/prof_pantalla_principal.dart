@@ -6,28 +6,35 @@ import 'package:http/http.dart' as http;
 import '../../widgets/custom_navigationbar.dart';
 import '../../widgets/random_lightcolor.dart';
 import '../../Controladores/save_preferences.dart';
+import '../../Controladores/Curso.dart';
 
 class ProfMainMenuScreen extends StatefulWidget {
   final String idUsuario;
-
   const ProfMainMenuScreen({super.key, required this.idUsuario});
-
   @override
   State<ProfMainMenuScreen> createState() => _ProfMainMenuScreenState();
 }
 
 class _ProfMainMenuScreenState extends State<ProfMainMenuScreen> {
-
   String _nombre = "";
   List<dynamic> _cursos = [];
   bool _isLoading = true;
+  List<Curso> _Cursos = [];
+
 
   @override
   void initState() {
     super.initState();
     _fetchUserData();
     _fetchCoursedta();
+    _printPreferences();
   }
+
+  void _printPreferences() async {
+    print("INFORMACION GUARDADA");
+    await SharedPrefUtils.printAllValues();
+  }
+
   Future<void> _saveUserData(Map<String, dynamic> userData) async {
     try {
       await SharedPrefUtils.saveString('apellidos', userData['apellidos'] ?? '');
@@ -78,7 +85,7 @@ class _ProfMainMenuScreenState extends State<ProfMainMenuScreen> {
         Uri.parse('https://kunan.onrender.com/usuario_info/user/${widget.idUsuario}'),
         headers: {'Content-Type': 'application/json'},
       );
-
+      print("CURSOS BACKEND");
       print(response.statusCode);
       print(response.body);
 
@@ -86,11 +93,14 @@ class _ProfMainMenuScreenState extends State<ProfMainMenuScreen> {
         final data = jsonDecode(response.body);
         final courses = data['cursos'] as List<dynamic>;
         final courseNames = courses.map((course) => course['nombre'].toString()).toList();
+        List<Curso> fetchedCourses = courses.map((course) => Curso.fromJson(course)).toList();
         setState(() {
+          _Cursos = fetchedCourses;
           _cursos = courseNames;
           _isLoading = false;
-          print(_cursos);
+          print(_Cursos);
         });
+        await _saveCourses(fetchedCourses);
       } else {
         throw Exception('Error al obtener datos del usuario');
       }
@@ -100,7 +110,15 @@ class _ProfMainMenuScreenState extends State<ProfMainMenuScreen> {
       );
     }
   }
-  
+
+  Future<void> _saveCourses(List<Curso> courses) async {
+    try {
+      await SharedPrefUtils.saveCourses('cursos', courses);
+      print('Cursos guardados exitosamente en SharedPreferences');
+    } catch (e) {
+      print('Error al guardar cursos en SharedPreferences: $e');
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -6,6 +6,7 @@ import '../../Controladores/Curso.dart';
 import '../../widgets/custom_navigationbar.dart';
 import '../../widgets/random_lightcolor.dart';
 import '../../Controladores/save_preferences.dart';
+import '../Alumnos/alum_asistencia.dart';
 
 class EstMainMenuScreen extends StatefulWidget {
   final String idUsuario;
@@ -27,18 +28,20 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
   @override
   void initState() {
     super.initState();
-    _printPreferences();
     _loadData();
+    _printPreferences();
   }
 
   void _printPreferences() async {
+    print("DATOS PREFERENCES");
     await SharedPrefUtils.printAllValues();
+
   }
   Future<void> _loadData() async {
     idUsuario = (await SharedPrefUtils.getString("userId"))!;
 
     final cursos = await SharedPrefUtils.getCourses('user_courses');
-
+    print(cursos);
     if (cursos.isNotEmpty) {
       setState(() {
         _cursos = cursos;
@@ -86,7 +89,7 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
             'https://kunan.onrender.com/usuario_info/info/$idUsuario'),
         headers: {'Content-Type': 'application/json'},
       );
-
+      print("DATOS USUARIO BACKEND");
       print(response.statusCode);
       print(response.body);
 
@@ -118,7 +121,7 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
         headers: {'Content-Type': 'application/json'},
       );
       print(
-          "----------------------------------------------------------------------------------");
+          "CURSOS-BACKEND");
       print(response.statusCode);
       print(response.body);
 
@@ -236,9 +239,9 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
 
                   // EN CURSO
                   Container(
-                    margin: EdgeInsets.only(left: size.width * 0.07, right: size.width * 0.06),
+                    margin: EdgeInsets.only(
+                        left: size.width * 0.07, right: size.width * 0.06),
                     alignment: Alignment.centerLeft,
-
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -271,7 +274,6 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
                     ),
                   ),
 
-
                   SizedBox(height: size.height * 0.03),
 
                   // MIS CURSOS
@@ -299,7 +301,7 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
                               final curso = _cursos[index];
                               final cursoNombre = curso.nombre;
                               final siglas =
-                                  cursoNombre.substring(0, 2).toUpperCase();
+                              cursoNombre.substring(0, 2).toUpperCase();
                               final Color color = getRandomLightColor();
                               const estado = 'Sin estado';
                               const usuario = 'Alumno';
@@ -317,6 +319,35 @@ class _EstMainMenuScreenState extends State<EstMainMenuScreen> {
                             },
                           ),
                       ],
+                    ),
+                  ),
+
+                  SizedBox(height: size.height * 0.03),
+
+                  // BOTÓN DE MARCAR ASISTENCIA
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AlumTomarAsistencia(),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromRGBO(128, 179, 255, 1),
+                      minimumSize: const Size(400, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      "Marcar Asistencia",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],

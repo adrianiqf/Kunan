@@ -82,8 +82,20 @@ class SharedPrefUtils {
 
     print('All SharedPreferences values:');
     for (String key in keys) {
-      final value = prefs.get(key);
-      print('$key: $value');
+      if (key == 'cursos') {  // Assuming 'courses' is the key used to store the courses
+        List<Curso> courses = await getCourses(key);
+        print('$key:');
+        for (var course in courses) {
+          print('  - ${course.nombre} (${course.id})');
+          print('    Día: ${course.dia}');
+          print('    Hora: ${course.horaInicio} - ${course.horaFin}');
+          print('    Duración: ${course.duracion} horas');
+          print('    Sección: ${course.seccion}');
+        }
+      } else {
+        final value = prefs.get(key);
+        print('$key: $value');
+      }
     }
   }
 

@@ -2,13 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:kunan_v01/pantallas/Profesores/prof_reporte_asistencia.dart';
 import 'package:kunan_v01/widgets/estudiantes_widget.dart';
 import 'package:http/http.dart' as http;
 import '../../widgets/custom_navigationbar.dart';
+import '../../Controladores/save_preferences.dart';
+import '../../Controladores/Curso.dart';
 
 class ProfTomarAsistencia extends StatefulWidget {
   const ProfTomarAsistencia({super.key});
@@ -29,6 +30,9 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
   bool _isLoading = true;
   List<Map<String, dynamic>> alumnosMatriculados = [];
   List<Map<String, dynamic>> attendanceList_w = [];
+  List<Map<String, dynamic>> _cursos = [];
+  Map<String, dynamic>? _selectedCurso;
+
 
   static const String SERVICE_UUID_CAMBIO_ESTADO =
       "2da27884-06ee-4a0d-9102-9eadb3e6629c";
@@ -43,7 +47,36 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
   void initState() {
     super.initState();
     _initBluetooth();
+    _loadSavedCourses();
   }
+  Future<void> _loadSavedCourses() async {
+    List<Curso> savedCourses = await SharedPrefUtils.getCourses('cursos');
+    setState(() {
+      _cursos = savedCourses.map((curso) => curso.toJson()).toList();
+    });
+  }
+  Widget _buildCourseDropdown() {
+    return DropdownButton<Map<String, dynamic>>(
+      value: _selectedCurso,
+      hint: Text('Seleccionar curso', style: TextStyle(color: Colors.white)),
+      dropdownColor: const Color.fromRGBO(1, 6, 24, 1),
+      onChanged: (Map<String, dynamic>? newValue) {
+        setState(() {
+          _selectedCurso = newValue;
+          if (_selectedCurso != null) {
+            id_curso = _selectedCurso!['id'];
+          }
+        });
+      },
+      items: _cursos.map<DropdownMenuItem<Map<String, dynamic>>>((Map<String, dynamic> curso) {
+        return DropdownMenuItem<Map<String, dynamic>>(
+          value: curso,
+          child: Text('${curso['nombre']} - ${curso['seccion']}', style: TextStyle(color: Colors.white)),
+        );
+      }).toList(),
+    );
+  }
+
   String getServiceName(BluetoothService service) {
     switch (service.uuid.toString()) {
       case '68cce3a1-a94d-4b2f-ac00-747066e80f05':
@@ -143,6 +176,7 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
       });
     }
   }
+
 
   Future<void> _iniciarAsistencia() async {
     if (selectedDevice == null) {
@@ -365,6 +399,32 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                 ),
               ),
               SizedBox(height: size.height * 0.03),
+              Text(
+                'Seleccionar Curso:',
+                style: TextStyle(
+                  fontSize: size.width * 0.05,
+                  color: const Color.fromRGBO(178, 219, 144, 1),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              _buildCourseDropdown(),
+              SizedBox(height: size.height * 0.02),
+              Text(
+                'Clase:',
+                style: TextStyle(
+                  fontSize: size.width * 0.05,
+                  color: const Color.fromRGBO(178, 219, 144, 1),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(height: size.height * 0.02),
+              Text(
+                _selectedCurso != null ? '${_selectedCurso!['nombre']} - ${_selectedCurso!['seccion']}' : 'No se ha seleccionado un curso',
+                style: TextStyle(
+                  fontSize: size.width * 0.055,
+                  color: Colors.white,
+                ),
+              ),
               DropdownButton<BluetoothDevice>(
                 value: selectedDevice,
                 hint: const Text('Seleccionar dispositivo',
@@ -439,24 +499,6 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                 ),
               ),
               SizedBox(height: size.height * 0.02),
-              Text(
-                'Clase:',
-                style: TextStyle(
-                  fontSize: size.width * 0.05,
-                  color: const Color.fromRGBO(178, 219, 144, 1),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              SizedBox(height: size.height * 0.02),
-              Text(
-                'Taller de Software Móvil',
-                style: TextStyle(
-                  fontSize: size.width * 0.055,
-                  color: Colors.white,
-                ),
-              ),
-              SizedBox(height: size.height * 0.03),
-
               Text(
                 'Control de asistencia:',
                 style: TextStyle(
@@ -550,15 +592,6 @@ class _ProfTomarAsistenciaState extends State<ProfTomarAsistencia> {
                     color: Color.fromRGBO(178, 219, 144, 1),
                     fontWeight: FontWeight.w600,
                   ),
-                ),
-              ),
-              SizedBox(height: size.height * 0.03),
-              Text(
-                'Estudiantes inasistentes:',
-                style: TextStyle(
-                  fontSize: size.width * 0.05,
-                  color: const Color.fromRGBO(178, 219, 144, 1),
-                  fontWeight: FontWeight.w600,
                 ),
               ),
               SizedBox(height: size.height * 0.04),
