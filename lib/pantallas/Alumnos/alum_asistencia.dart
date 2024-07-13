@@ -191,11 +191,9 @@ class _AlumTomarAsistenciaState extends State<AlumTomarAsistencia> {
         asistenciaMarcada = true;
         asistenciaTime = formattedTime;
       });
-      /* // Disconnect from the BLE server
+      /*
       await selectedDevice!.disconnect();
       print('Desconectado del servidor BLE');
-
-      // Optionally, you can set selectedDevice to null after disconnecting
       setState(() {
         selectedDevice = null;
       });*/
