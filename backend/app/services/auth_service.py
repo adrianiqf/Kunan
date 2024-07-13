@@ -84,7 +84,11 @@ def authenticate_user(db, correo, password):
         for doc in user_ref:
             user = Usuario.from_dict(doc.to_dict())
             if user.password == password:
-                return {"success": True, "id": doc.id, "esprofesor": user.esProfesor}
+                if user.nombres == 'admin':
+                    print("Usuario admin")
+                    return {"success": True, "id": doc.id, "esprofesor": user.esProfesor, "esadmin": True}
+                else:
+                    return {"success": True, "id": doc.id, "esprofesor": user.esProfesor, "esadmin": False}
         return {"success": False, "message": "Credenciales incorrectas"}
     except Exception as e:
         print(f"Error authenticating user: {e}")

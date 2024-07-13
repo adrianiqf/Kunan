@@ -41,6 +41,9 @@ def login():
 
     print(user)
     
+    if user['success'] and user['esadmin']==True:
+        return jsonify({"id": user['id'], "esAdmin": user['esadmin'], "acceso": "Acceso exitoso"}), 200
+
     if user['success']:
         return jsonify({"id": user['id'], "esProfesor": user['esprofesor'], "acceso": "Acceso exitoso"}), 200
     else:
@@ -48,4 +51,4 @@ def login():
 
 @auth_bp.route('/admin')
 def admin():
-    return redirect("https://pillpop.000webhostapp.com/templates/html/menu.html")
+    return redirect("https://pillpop.000webhostapp.com/templates/html/inicioWeb.html")
