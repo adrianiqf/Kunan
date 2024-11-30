@@ -51,4 +51,4 @@ def login():
 
 @auth_bp.route('/admin')
 def admin():
-    return redirect("https://pillpop.000webhostapp.com/templates/html/inicioWeb.html")
+    return redirect("https://voluble-seahorse-50c073.netlify.app/templates/html/menu.html")
